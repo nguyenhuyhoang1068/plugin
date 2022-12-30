@@ -19,16 +19,17 @@ p{
   color: #000;
   line-height: 1.2em;
 }
-
-#top, #mid,#bot{
-  border-bottom: 1px solid #000;
+<!-- TRG-2 Start -->
+#top, #mid{
+  border-bottom: 1px dashed #000;
+  margin-bottom:10px !important;
 }
-
+<!-- TRG-2 End -->
 #top{
     min-height: 100px;
     text-align: center;
 }
-#mid{min-height: 80px;}
+#mid{min-height: 50px;}<!-- TRG-2 -->
 #bot{ min-height: 50px;}
 
 #top .logo{
