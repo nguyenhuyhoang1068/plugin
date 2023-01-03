@@ -52,7 +52,7 @@
     </tr>
     <tr class="tabletitle">
         <td></td>
-        <td class="Rate grand-total-title" colspan="3"><h2>Grand Total</h2></td>
+        <td class="Rate grand-total-title" colspan="3"><h2>Grand Total text 1</h2></td><!-- TRG-2  -->
         <td class="payment grand-total-amount"><h2><%= grand_total %></h2></td>
     </tr>
 </table>
@@ -108,7 +108,7 @@
     </tr>
     <tr class="tabletitle">
 
-        <td class="Rate grand-total-title" style="text-align:right;padding-right:5px;"  colspan="3"><h2>Grand Total</h2></td>
+        <td class="Rate grand-total-title" style="text-align:right;padding-right:5px;"  colspan="3"><h2>Grand Total 1</h2></td>
         <td class="payment grand-total-amount"><h2><%= grand_total %></h2></td>
     </tr>
 </table>

@@ -3714,14 +3714,18 @@ class OP_Woo{
         $username = apply_filters('op_customer_username',sanitize_title($username),$request);
         if(!$email)
         {
-            $demo_domain_email = apply_filters('op_customer_demo_domain','@open-pos.com');
+            $demo_domain_email = apply_filters('op_customer_demo_domain','@gmail.com');
             $email = $username.$demo_domain_email;
         }
-        $require_phone = apply_filters('op_customer_require_phone',true,$phone);
-        if(!$phone && $require_phone)
+        // TRG-2 start
+           global $wpdb;
+        $phone = isset($request['phone']) &&  $request['phone'] != 'null'  ? $request['phone'] : '';
+        $result_add_custom = $wpdb->get_results ( $wpdb->prepare("  SELECT * FROM wp_users AS cuser INNER JOIN wp_usermeta AS user_meta ON cuser.ID = user_meta.user_id WHERE user_meta.meta_key = 'billing_phone' and user_meta.meta_value LIKE %s",$phone) ,ARRAY_A);
+        if(count($result_add_custom)>= 1 && $phone !='')
         {
-            $result['message'] = __('Please enter phone number','openpos' );
+            $result['message'] = __('Already have an account using this phone number','openpos' );
         }
+        // TRG-2 end 
         if($password !== false)
         {
             if($password != $confirm_password)
