@@ -1,5 +1,6 @@
 
 
-<div id="legalcopy">
-     <p class="legal"><strong>Thank you for your business!</strong>  Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices.</p>
+<div id="legalcopy"><!-- TRG-2 Start -->
+     <p style="text-align: center;" class="legal">Quý khách vui lòng kiểm tra hàng trước khi thanh toán. Hàng sẽ không được đổi sau khi đã thanh toán
+     <br/>Cảm ơn quý khách. Hẹn gặp lại!</p><!-- TRG-2 End -->
 </div>

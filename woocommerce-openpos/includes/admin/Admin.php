@@ -31,6 +31,8 @@ class Openpos_Admin{
 
     public function init()
     {
+       
+
         add_action( 'admin_notices',array($this, 'admin_notice') );
         add_action( 'admin_init', array($this, 'admin_init') );
         add_action( 'init', array($this, '_short_code') );
@@ -260,7 +262,7 @@ class Openpos_Admin{
 
         $addition_general_setting = array();
         $wc_order_status = wc_get_order_statuses();
-        /*
+	// TRG -2 START 
         if(isset($allow_payment_methods['stripe']))
         {
             $addition_general_setting = array(
@@ -279,7 +281,8 @@ class Openpos_Admin{
                     'default' => ''
                 ),
             );
-        }*/
+        }
+	// TRG-2 END 
         if($allow_refund_duration == 'yes_day')
         {
             $refund_duration = array(
@@ -430,7 +433,7 @@ class Openpos_Admin{
             {
                 $tax_rate_options[$k] = $v; 
             }
-            $tax_rate_options['op_productax'] =  __( 'Use cart items Tax', 'openpos' );
+		// TRG -2 
 
             $pos_discount_tax_class_setting = array(
                 'name'              => 'pos_discount_tax_class',
@@ -441,7 +444,7 @@ class Openpos_Admin{
                 'options' => $tax_rate_options
             );
 
-            if($setting_pos_discount_tax_class != 'op_notax' && $setting_pos_discount_tax_class != 'op_productax')
+            if($setting_pos_discount_tax_class != 'op_notax')
             {
                 $rates = $op_woo->getTaxRates($setting_pos_discount_tax_class);
 
@@ -594,7 +597,7 @@ class Openpos_Admin{
                 array(
                     'name'    => 'pos_pwa_enable',
                     'label'   => __( 'Progressive Web Apps Cached', 'openpos' ),
-                    'desc'    => __( 'To use this feature, your POS url should under HTTP. OpenPOS Progressive Web Apps on Desktop can be ‘installed’ on the user’s device much like native apps. It’s fast. Feel integrated because they launched in the same way as other apps, and run in an app window, without an address bar or tabs. It is reliable because service workers can cache all of the assets they need to run. And it create an engaging experience for users.', 'openpos' ),
+                    'desc'    => __( 'OpenPOS Progressive Web Apps on Desktop can be ‘installed’ on the user’s device much like native apps. It’s fast. Feel integrated because they launched in the same way as other apps, and run in an app window, without an address bar or tabs. It is reliable because service workers can cache all of the assets they need to run. And it create an engaging experience for users.', 'openpos' ),// TRG -2 
                     'type'    => 'select',
                     'default' => 'yes',
                     'options' =>  array(
@@ -1356,7 +1359,7 @@ class Openpos_Admin{
         }
         $addition_general_setting = apply_filters('op_addition_general_setting',$addition_general_setting);
         $settings_fields['openpos_payment'] = array_merge($settings_fields['openpos_payment'],$addition_general_setting);
-        return  apply_filters('op_setting_fields',$settings_fields);
+        return $settings_fields;// TRG -2 
     }
 
     public function products()
@@ -2007,9 +2010,9 @@ class Openpos_Admin{
         {
             $args['s'] = $searchPhrase;
         }
-        $final_args = apply_filters('admin_get_inventories_args',$args );
+	//TRG -2 
 
-        $posts = $this->core->getProducts($final_args);
+        $posts = $this->core->getProducts($args);//TRG -2 
         $posts_array = $posts['posts'];
         $total = $posts['total'];
         $fields = array('post_title');
@@ -2114,14 +2117,13 @@ class Openpos_Admin{
         }
 
 
-       
-        $result = apply_filters('op_warehouse_inventory_result', array(
+        $result = array(
             'current' => $current,
             'rowCount' => $rowCount,
             'rows' => $rows,
             'total' => $total
 
-        ));
+        );// TRG -2 
         echo json_encode($result);
         exit;
     }
@@ -2210,8 +2212,8 @@ class Openpos_Admin{
         {
             $args['s'] = $searchPhrase;
         }
-        $final_args = apply_filters('admin_transactions_args',$args );
-        $get_posts = new WP_Query($final_args);
+// TRG -2 
+        $get_posts = new WP_Query($args);// TRG -2 
         $posts = array('total'=>$get_posts->found_posts,'posts' => $get_posts->get_posts());
 
         $posts_array = $posts['posts'];
@@ -2362,10 +2364,7 @@ class Openpos_Admin{
             $args['post__in'] = [$searchPhrase];
         }
 
-        $final_args = apply_filters('admin_orders_args',$args );
-
-        $get_posts = new WP_Query($final_args);
-
+        $get_posts = new WP_Query($args);
         $posts = array('total'=>$get_posts->found_posts,'posts' => $get_posts->get_posts());
 
         $posts_array = $posts['posts'];
@@ -2400,11 +2399,7 @@ class Openpos_Admin{
         {
             $id = $post->ID;
             $order = wc_get_order($id);
-
-            if(!$order)
-            {
-                continue;
-            }
+// TRG -2 
 
             $register_id = get_post_meta($id,'_pos_order_cashdrawer',true);
 
@@ -2519,7 +2514,7 @@ class Openpos_Admin{
                 wp_enqueue_script('openpos.admin-jquery.datatable', OPENPOS_URL.'/assets/js/datatable.js',['jquery','jquery-ui-core','jquery-ui-datepicker'],$info['Version']);
                 wp_enqueue_script('openpos.admin-jquery.datatable.jquery', OPENPOS_URL.'/assets/js/datatable.jquery.js','jquery',$info['Version']);
                 wp_enqueue_script('openpos.admin-jquery.datatable.jquery.csv', OPENPOS_URL.'/assets/js/jquery.tabletoCSV.js','jquery',$info['Version']);
-                wp_enqueue_script('openpos.kitchen.timeago', OPENPOS_URL.'/assets/js/jquery.timeago.js','',$info['Version']);
+// TRG -2 
 
             }else{
 
@@ -2599,14 +2594,14 @@ class Openpos_Admin{
             'parent' => 'site-name',
             'id'     => 'view-pos',
             'target'     => '_blank',
-            'title'  => __( 'Visit POS', 'openpos' ),
+            'title'  => __( 'Visit POS', 'woocommerce' ),
             'href'   => $pos_url,
         ) );
     }
 
     function pos_admin_menu() {
         $openpos_type = $this->settings_api->get_option('openpos_type','openpos_pos');
-        $page = add_menu_page( __( 'Open POS', 'openpos' ), __( 'POS', 'openpos' ),'manage_woocommerce','openpos-dasboard',array($this,'dashboard'),plugins_url('woocommerce-openpos/assets/images/pos.png'),59 );
+        $page = add_menu_page( __( 'Open POS', 'openpos' ), __( 'Quản lý kho hàng', 'openpos' ),'manage_woocommerce','openpos-dasboard',array($this,'dashboard'),plugins_url('woocommerce-openpos/assets/images/pos.png'),59 );// TRG -2 
         add_action( 'admin_print_styles-'. $page, array( &$this, 'admin_enqueue' ) );
 
         $page = add_submenu_page( 'openpos-dasboard', __( 'POS - Orders', 'openpos' ),  __( 'Orders', 'openpos' ) , 'manage_woocommerce', 'op-orders', array( $this, 'orders_page' ) );
@@ -2741,7 +2736,7 @@ class Openpos_Admin{
                 $template_css = $template_details['custom_css'];
                 $default = array(
                     'id' => $id,
-                    'name' => get_the_title($id),
+// TRG -2 
                     'type' => $template_type,
                     'order_id' => $order_id,
                     'paper_width' => $paper_width,
@@ -2763,13 +2758,15 @@ class Openpos_Admin{
 
     function products_page() {
         $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
-        $template_path = OPENPOS_DIR.'templates/admin/products.php';
+// TRG -2 
         if($action == 'print-barcode')
         {
-            $template_path = OPENPOS_DIR.'templates/admin/print_barcode.php';
+	// TRG -2 START
+            require(OPENPOS_DIR.'templates/admin/print_barcode.php');
+        }else{
+            require(OPENPOS_DIR.'templates/admin/products.php');
         }
-        require( apply_filters('op_admin_template_products_page',$template_path,$action,$this));
-        
+        // TRG -2 END
     }
     function register_page() {
         require(OPENPOS_DIR.'templates/admin/registers.php');
@@ -2910,11 +2907,11 @@ class Openpos_Admin{
                 $out_value = get_post_meta($s->ID,'_out_amount',true);
                 if($in_value !== false)
                 {
-                    $in = ((int)$in_value *  1);//TRG-5
+                    $in = 1 * $in_value;
                 }
                 if($out_value !== false)
                 {
-                    $out = ((int)$out_value *  1);//TRG-5
+                    $out = 1 * $out_value;
                 }
                 $_transaction_details = get_post_meta($s->ID,'_transaction_details',true);
                 $_total = ($in - $out);
@@ -3057,1044 +3054,345 @@ class Openpos_Admin{
             }else{
                 $result = array();
                 $ranges = array();
-                try{
-                    if($report_duration == 'custom')
-                    {
-                        $gameFrom = Carbon::parse($custom_from.' 00:00:00', 'UTC');
-                        $gameTo = Carbon::parse($custom_to.' 00:00:00', 'UTC');
-                        $ranges = $this->core->getReportRanges($report_duration,$gameFrom->toFormattedDateString('Y-m-d'),$gameTo->toFormattedDateString('Y-m-d'));
-                    }else{
-                        $ranges = $this->core->getReportRanges($report_duration,false,false);
-                    }
-    
-                    if($time_offset_mins)
-                    {
-                        $ranges = $this->core->convertToUtc($ranges,$time_offset_mins);
-                    }
-    
-                    $orders_table_data = array();
-                    $orders_export_data = array();
-                    
-                    $chart_data = array();
-                    $summary_html = '';
-                    $summary_data = array(
-                        'total_order' => 0,
-                        'total_sales' => 0,
-                        'total_transaction' => 0,
-                        'total_transaction_cash' => 0
-                    );
-                    $table_label = array(
-                        __('Order','openpos'),
-                        __('Grand Total','openpos'),
-                        __('Profit Total','openpos'),
-                        __('Tip Total','openpos'),
-                        __('Cashier','openpos'),
-                        __('Created At','openpos'),
-                        __('View','openpos'),
-                    );
-                    switch ($report_type)
-                    {
-                        case 'transactions':
-                            $table_label = array(
-                                __('#','openpos'),
-                                __('Ref','openpos'),
-                                __('IN','openpos'),
-                                __('OUT','openpos'),
-                                __('Method','openpos'),
-                                __('Created At','openpos'),
-                                __('Created By','openpos')
-                            );
-                            $orders_export_data[] = $table_label;
-                            $chart_data[] = array(
-                                __('Date','openpos'),
-                                __('Cash Transactions','openpos')
-                            );
-    
-                            foreach($ranges['ranges'] as $r)
-                            {
-                                $total_transaction = 0;
-                                if($report_register_id > 0)
-                                {
-                                    $transactions = $this->core->getPosRegisterTransactionsByDate($report_register_id,$r['from'],$r['to']);
-                                }elseif($report_outlet_id > 0)
-                                {
-                                    $transactions = $this->core->getPosWarehouseTransactionsByDate($report_outlet_id,$r['from'],$r['to']);
-                                }else{
-                                    $transactions = $this->core->getPosTransactionsByDate($r['from'],$r['to']);
-                                }
-    
-                                foreach($transactions as $s)
-                                {
-                                    $in = get_post_meta($s->ID,'_in_amount',true);
-                                    $out = get_post_meta($s->ID,'_out_amount',true);
-                                    $total_transaction += ($in - $out);
-                                }
-                                $chart_data[] = array(
-                                    $r['label'],
-                                    $total_transaction
-                                );
-                            }
-    
-    
+// TRG -2 
+                if($report_duration == 'custom')
+                {
+
+                    $gameFrom = Carbon::parse($custom_from.' 00:00:00', 'UTC');
+                    $gameTo = Carbon::parse($custom_to.' 00:00:00', 'UTC');
+                    $ranges = $this->core->getReportRanges($report_duration,$gameFrom->toFormattedDateString('Y-m-d'),$gameTo->toFormattedDateString('Y-m-d'));
+                }else{
+                    $ranges = $this->core->getReportRanges($report_duration,false,false);
+                }
+
+                if($time_offset_mins)
+                {
+                    $ranges = $this->core->convertToUtc($ranges,$time_offset_mins);
+                }
+
+               
+
+                $orders_table_data = array();
+                $orders_export_data = array();
+                
+                $chart_data = array();
+                $summary_html = '';
+                $summary_data = array(
+                    'total_order' => 0,
+                    'total_sales' => 0,
+                    'total_transaction' => 0,
+                    'total_transaction_cash' => 0
+                );
+                $table_label = array(
+                    __('Order','openpos'),
+                    __('Grand Total','openpos'),
+                    __('Profit Total','openpos'),
+                    __('Tip Total','openpos'),
+                    __('Cashier','openpos'),
+                    __('Created At','openpos'),
+                    __('View','openpos'),
+                );
+                switch ($report_type)
+                {
+                    case 'transactions':
+                        $table_label = array(
+                            __('#','openpos'),
+                            __('Ref','openpos'),
+                            __('IN','openpos'),
+                            __('OUT','openpos'),
+                            __('Method','openpos'),
+                            __('Created At','openpos'),
+                            __('Created By','openpos')
+                        );
+                        $orders_export_data[] = $table_label;
+                        $chart_data[] = array(
+                            __('Date','openpos'),
+                            __('Cash Transactions','openpos')
+                        );
+
+                        foreach($ranges['ranges'] as $r)
+                        {
+
+
+                            $total_transaction = 0;
                             if($report_register_id > 0)
                             {
-                                $transactions = $this->core->getPosRegisterTransactionsByDate($report_register_id,$ranges['start'],$ranges['end']);
+                                $transactions = $this->core->getPosRegisterTransactionsByDate($report_register_id,$r['from'],$r['to']);
                             }elseif($report_outlet_id > 0)
                             {
-                                $transactions = $this->core->getPosWarehouseTransactionsByDate($report_outlet_id,$ranges['start'],$ranges['end']);
+                                $transactions = $this->core->getPosWarehouseTransactionsByDate($report_outlet_id,$r['from'],$r['to']);
                             }else{
-                                $transactions = $this->core->getPosTransactionsByDate($ranges['start'],$ranges['end']);
+                                $transactions = $this->core->getPosTransactionsByDate($r['from'],$r['to']);
                             }
-                            $total_in = 0;
-                            $total_out = 0;
-                            foreach($transactions as $_transaction)
+
+                            foreach($transactions as $s)
                             {
-                                $id = $_transaction->ID;
-                                $user_id = get_post_meta($id,'_user_id',true);
-    
-                                $name = 'Unknown';
-                                if($user_id)
-                                {
-                                    $user = get_user_by('ID',$user_id);
-                                    $name = $user->display_name;
-                                }
-                                $in_amount = get_post_meta($id,'_in_amount',true);
-                                $out_amount = get_post_meta($id,'_out_amount',true);
-                                $method = get_post_meta($id,'_payment_name',true);
-                                if(!$method)
-                                {
-                                    $method = __('Cash','openpos');
-                                }
-                                $total_in += $in_amount;
-                                $total_out += $out_amount;
-                                $tmp = array(
-                                    $id,
-                                    $_transaction->post_title,
-                                    wc_price($in_amount),
-                                    wc_price($out_amount),
-                                    $method,
-                                    get_post_meta($id,'_created_at',true),
-                                    $name
-                                );
-                                $orders_table_data[] = $tmp;
-                                $tmp_export = array(
-                                    $id,
-                                    $_transaction->post_title,
-                                    $in_amount,
-                                    $out_amount,
-                                    $method,
-                                    get_post_meta($id,'_created_at',true),
-                                    $name
-                                );
-                                $orders_export_data[] = $tmp_export;
-    
+
+                                $in = get_post_meta($s->ID,'_in_amount',true);
+                                $out = get_post_meta($s->ID,'_out_amount',true);
+                                $total_transaction += ($in - $out);
                             }
-                            $summary_html = '';
-                            $title =  __('Total IN','openpos');
-                            $value = wc_price($total_in);
-                            $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
-                            $summary_html .= '<div class="summary-block">';
-                            $summary_html .= '<dl>';
-                            $summary_html .= '<dt>'.$title.'</dt>';
-                            $summary_html .= '<dd>'.$value.'</dd>';
-                            $summary_html .= '</dl>';
-                            $summary_html .= '</div>';
-                            $summary_html .= '</div>';
-    
-                            $title =  __('Total OUT','openpos');
-                            $value = wc_price($total_out);
-                            $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
-                            $summary_html .= '<div class="summary-block">';
-                            $summary_html .= '<dl>';
-                            $summary_html .= '<dt>'.$title.'</dt>';
-                            $summary_html .= '<dd>'.$value.'</dd>';
-                            $summary_html .= '</dl>';
-                            $summary_html .= '</div>';
-                            $summary_html .= '</div>';
-                            break;
-                        case 'sale_by_agent':
+                            $chart_data[] = array(
+                                $r['label'],
+                                $total_transaction
+                            );
+                        }
+
+
+                        if($report_register_id > 0)
+                        {
+                            $transactions = $this->core->getPosRegisterTransactionsByDate($report_register_id,$ranges['start'],$ranges['end']);
+                        }elseif($report_outlet_id > 0)
+                        {
+                            $transactions = $this->core->getPosWarehouseTransactionsByDate($report_outlet_id,$ranges['start'],$ranges['end']);
+                        }else{
+                            $transactions = $this->core->getPosTransactionsByDate($ranges['start'],$ranges['end']);
+                        }
+                        $total_in = 0;
+                        $total_out = 0;
+                        foreach($transactions as $_transaction)
+                        {
+                            $id = $_transaction->ID;
+                            $user_id = get_post_meta($id,'_user_id',true);
+
+                            $name = 'Unknown';
+                            if($user_id)
+                            {
+                                $user = get_user_by('ID',$user_id);
+                                $name = $user->display_name;
+                            }
+                            $in_amount = get_post_meta($id,'_in_amount',true);
+                            $out_amount = get_post_meta($id,'_out_amount',true);
+                            $method = get_post_meta($id,'_payment_name',true);
+                            if(!$method)
+                            {
+                                $method = __('Cash','openpos');
+                            }
+                            $total_in += $in_amount;
+                            $total_out += $out_amount;
+                            $tmp = array(
+                                $id,
+                                $_transaction->post_title,
+                                wc_price($in_amount),
+                                wc_price($out_amount),
+                                $method,
+                                get_post_meta($id,'_created_at',true),
+                                $name
+                            );
+                            $orders_table_data[] = $tmp;
+                            $tmp_export = array(
+                                $id,
+                                $_transaction->post_title,
+                                $in_amount,
+                                $out_amount,
+                                $method,
+                                get_post_meta($id,'_created_at',true),
+                                $name
+                            );
+                            $orders_export_data[] = $tmp_export;
+
+                        }
+                        $summary_html = '';
+                        $title =  __('Total IN','openpos');
+                        $value = wc_price($total_in);
+                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
+                        $summary_html .= '<div class="summary-block">';
+                        $summary_html .= '<dl>';
+                        $summary_html .= '<dt>'.$title.'</dt>';
+                        $summary_html .= '<dd>'.$value.'</dd>';
+                        $summary_html .= '</dl>';
+                        $summary_html .= '</div>';
+                        $summary_html .= '</div>';
+
+                        $title =  __('Total OUT','openpos');
+                        $value = wc_price($total_out);
+                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
+                        $summary_html .= '<div class="summary-block">';
+                        $summary_html .= '<dl>';
+                        $summary_html .= '<dt>'.$title.'</dt>';
+                        $summary_html .= '<dd>'.$value.'</dd>';
+                        $summary_html .= '</dl>';
+                        $summary_html .= '</div>';
+                        $summary_html .= '</div>';
+                        break;
+                    case 'sale_by_agent':
+                        $table_label = array(
+                            __('Order','openpos'),
+                            __('Grand Total','openpos'),
+                            __('Seller Amount','openpos'),
+                            __('Tip Amount','openpos'),
+                            __('Cashier','openpos'),
+                            __('Created At','openpos'),
+                            __('View','openpos'),
+                        );
+                        
+                        $is_all = false;
+                        $orders_export_data = array();
+                        if($report_seller_id == '_all')
+                        {
+                            $is_all = true;
                             $table_label = array(
+                                __('User','openpos'),
+                                __('Email','openpos'),
+                                __('Sold Total','openpos'),
+                                __('Sold QTY','openpos'),
+                                __('Total Order','openpos'),
+                                __('Total Tip','openpos'),
+                            );
+                           
+                            $orders_export_data[] = array(
+                                __('User','openpos'),
+                                __('Email','openpos'),
+                                __('Sold Total','openpos'),
+                                __('Sold QTY','openpos'),
+                                __('Total Order','openpos'),
+                                __('Total Tip','openpos'),
+                            );
+                        }else{
+                            
+                            if($report_seller_id)
+                            {
+                                $seller_name = 'Unknown';
+                                $seller_user = get_user_by('id',$report_seller_id);
+                                
+                                
+                                if($seller_user)
+                                {
+                                    $seller_user_data = $seller_user->data;
+                                    $seller_name = $seller_user_data->user_nicename ? $seller_user_data->user_nicename : $seller_user_data->user_login;
+                                }
+                                
+                                $orders_export_data[] = array(
+                                    __('User','openpos'),
+                                    $seller_name,
+                                   '',
+                                   '',
+                                   '',
+                                   '',
+                                );
+                            }
+                            $orders_export_data[] = array(
                                 __('Order','openpos'),
                                 __('Grand Total','openpos'),
                                 __('Seller Amount','openpos'),
                                 __('Tip Amount','openpos'),
                                 __('Cashier','openpos'),
-                                __('Created At','openpos'),
-                                __('View','openpos'),
-                            );
-                            
-                            $is_all = false;
-                            $orders_export_data = array();
-                            if($report_seller_id == '_all')
-                            {
-                                $is_all = true;
-                                $table_label = array(
-                                    __('User','openpos'),
-                                    __('Email','openpos'),
-                                    __('Sold Total','openpos'),
-                                    __('Sold QTY','openpos'),
-                                    __('Total Order','openpos'),
-                                    __('Total Tip','openpos'),
-                                );
-                               
-                                $orders_export_data[] = array(
-                                    __('User','openpos'),
-                                    __('Email','openpos'),
-                                    __('Sold Total','openpos'),
-                                    __('Sold QTY','openpos'),
-                                    __('Total Order','openpos'),
-                                    __('Total Tip','openpos'),
-                                );
-                            }else{
-                                
-                                if($report_seller_id)
-                                {
-                                    $seller_name = 'Unknown';
-                                    $seller_user = get_user_by('id',$report_seller_id);
-                                    
-                                    
-                                    if($seller_user)
-                                    {
-                                        $seller_user_data = $seller_user->data;
-                                        $seller_name = $seller_user_data->user_nicename ? $seller_user_data->user_nicename : $seller_user_data->user_login;
-                                    }
-                                    
-                                    $orders_export_data[] = array(
-                                        __('User','openpos'),
-                                        $seller_name,
-                                       '',
-                                       '',
-                                       '',
-                                       '',
-                                    );
-                                }
-                                $orders_export_data[] = array(
-                                    __('Order','openpos'),
-                                    __('Grand Total','openpos'),
-                                    __('Seller Amount','openpos'),
-                                    __('Tip Amount','openpos'),
-                                    __('Cashier','openpos'),
-                                    __('Created At','openpos')
-                                );
-                               
-                                
-                            }
-    
-                            if($report_seller_id && !$is_all)
-                            {
-                                $chart_data[] = array(
-                                    __('Date','openpos'),
-                                    __('Sales','openpos')
-                                );
-                                foreach($ranges['ranges'] as $r)
-                                {
-    
-                                    $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
-                                    $total_sales = 0;
-                                    foreach($sales as $s)
-                                    {
-                                        $order = new WC_Order($s->ID);
-                                        $items = $order->get_items();
-    
-                                        $_agent_sale_id = $order->get_meta('_op_sale_by_cashier_id');
-    
-                                        if($_agent_sale_id && $_agent_sale_id == $report_seller_id)
-                                        {
-    
-                                            $total_sales += $order->get_total() - $order->get_total_refunded();
-                                        }
-    
-                                    }
-    
-                                    $chart_data[] = array(
-                                        $r['label'],
-                                        $total_sales
-                                    );
-                                }
-                                $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
-                                $summary_data['total_order'] = count($orders);
-                                $summary_data['total_qty']  = 0;
-                                $summary_data['total_tip']  = 0;
-                                foreach($orders as $_order)
-                                {
-                                    $order = new WC_Order($_order->ID);
-                                    $items = $order->get_items();
-                                    $is_sale_by_seller = false;
-                                    $seller_order_sale = 0;
-                                    $_agent_sale_id = $order->get_meta('_op_sale_by_cashier_id');
-    
-                                    if($_agent_sale_id && $_agent_sale_id == $report_seller_id)
-                                    {
-                                        $is_sale_by_seller = true;
-                                        $summary_data['total_sales'] += $order->get_total() - $order->get_total_refunded();
-                                        $seller_order_sale += $order->get_total();
-    
-                                        $tip_total =$op_report->getSaleTip($order);
-                                        $summary_data['total_tip']  +=  $tip_total;
-    
-                                        foreach($items as $item)
-                                        {
-                                           $summary_data['total_qty'] += $item->get_quantity();
-                                        }
-    
-    
-                                        $created_at = $order->get_date_created();
-    
-                                        $post_author_id = $_agent_sale_id;
-                                        $author =   get_userdata($post_author_id);
-                                        $author_name = 'Unknown';
-                                        if($author)
-                                        {
-                                            $author_name = $author->display_name;
-                                        }
-                                        $grand_total = $order->get_total() - $order->get_total_refunded();
-    
-                                        $orders_table_data[] = array(
-                                            $order->get_order_number(),
-                                            strip_tags(wc_price($grand_total)),
-                                            strip_tags(wc_price($seller_order_sale)),
-                                            strip_tags(wc_price($tip_total )),
-                                            $author_name,
-                                            wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
-                                            '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
-                                        );
-    
-                                        $tmp_export = array(
-                                            $order->get_order_number(),
-                                            $grand_total,
-                                            $seller_order_sale,
-                                            $tip_total,
-                                            $author_name,
-                                            wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
-                                        );
-                                        $orders_export_data[] = $tmp_export;
-                                    }
-    
-    
-                                }
-                                $summary_html = '';
-                                foreach($summary_data as $k => $v)
-                                {
-                                    if(in_array($k,array('total_sales','total_qty','total_tip')))
-                                    {
-                                        $title =  __('Total Qty','openpos');
-                                        $value = $v;
-                                        if($k == 'total_sales')
-                                        {
-                                            $title =  __('Total Sales','openpos');
-                                            $value = wc_price($v);
-                                        }
-                                        if($k == 'total_tip')
-                                        {
-                                            $title =  __('Total Tip','openpos');
-                                            $value = wc_price($v);
-                                        }
-    
-                                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
-                                        $summary_html .= '<div class="summary-block">';
-                                        $summary_html .= '<dl>';
-                                        $summary_html .= '<dt>'.$title.'</dt>';
-                                        $summary_html .= '<dd>'.$value.'</dd>';
-                                        $summary_html .= '</dl>';
-                                        $summary_html .= '</div>';
-                                        $summary_html .= '</div>';
-                                    }
-                                }
-                            }
-                            if($is_all)
-                            {
-    
-                                $all_sellers_id = array();
-    
-                                $all_seller_report = $op_report->getSaleByCashierReport($all_sellers_id,$ranges['start'],$ranges['end']);
-                                $summary_data = array(
-                                    'total_sales' => 0,
-                                    'total_qty' => 0,
-                                    'total_order' => 0,
-                                    'total_tip' => 0,
-                                );
-                                foreach($all_seller_report as $user_id => $report_data)
-                                {
-                                    $summary_data['total_sales'] += $report_data['total_sale'];
-                                    $summary_data['total_qty'] += $report_data['total_qty'];
-                                    $summary_data['total_order'] += $report_data['total_order'];
-                                    $summary_data['total_tip'] += $report_data['total_tip'];
-                                    $user_name = __('Unknown');
-                                    $user_email = __('Unknown');
-                                    if($user_id)
-                                    {
-                                        $author_obj = get_user_by('id', $user_id);
-                                        if($author_obj)
-                                        {
-                                            $user_name = $author_obj->user_nicename ? $author_obj->user_nicename : $author_obj->user_login;
-                                            $user_email = $author_obj->user_email;
-                                        }
-    
-                                    }
-                                    $orders_table_data[] = array(
-                                        $user_name,
-                                        $user_email,
-                                        wc_price($report_data['total_sale']),
-                                        $report_data['total_qty'],
-                                        $report_data['total_order'],
-                                        $report_data['total_tip'],
-                                    );
-                                    $tmp_export = array(
-                                        $user_name,
-                                        $user_email,
-                                        $report_data['total_sale'],
-                                        $report_data['total_qty'],
-                                        $report_data['total_order'],
-                                        $report_data['total_tip'],
-                                    );
-                                    $orders_export_data[] = $tmp_export;
-                                }
-                                
-                                $summary_html = '';
-    
-                                foreach($summary_data as $k => $v)
-                                {
-                                    if(in_array($k,array('total_sales','total_qty','total_order','total_tip')))
-                                    {
-                                        $title =  __('Total Qty','openpos');
-                                        $value = $v;
-                                        if($k == 'total_sales')
-                                        {
-                                            $title =  __('Total Sales','openpos');
-                                            $value = wc_price($v);
-                                        }
-                                        if($k == 'total_tip')
-                                        {
-                                            $title =  __('Total Tip','openpos');
-                                            $value = wc_price($v);
-                                        }
-                                        if($k == 'total_order')
-                                        {
-                                            $title =  __('Total Orders','openpos');
-                                           
-                                        }
-                                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3" style="margin-bottom: 15px;">';
-                                        $summary_html .= '<div class="summary-block">';
-                                        $summary_html .= '<dl>';
-                                        $summary_html .= '<dt>'.$title.'</dt>';
-                                        $summary_html .= '<dd>'.$value.'</dd>';
-                                        $summary_html .= '</dl>';
-                                        $summary_html .= '</div>';
-                                        $summary_html .= '</div>';
-                                    }
-                                }
-                            }
-    
-                            break;
-                        case 'sale_by_seller':
-                            $table_label = array(
-                                __('Order','openpos'),
-                                __('Grand Total','openpos'),
-                                __('Seller Amount','openpos'),
-                                __('Cashier','openpos'),
-                                __('Created At','openpos'),
-                                __('View','openpos'),
-                            );
-                           
-                            $is_all = false;
-                            $orders_export_data = array();
-                            if($report_seller_id == '_all')
-                            {
-                                $is_all = true;
-                                $table_label = array(
-                                    __('User','openpos'),
-                                    __('Email','openpos'),
-                                    __('Sold Total','openpos'),
-                                    __('Sold QTY','openpos'),
-                                );
-                                $orders_export_data[] = array(
-                                    __('User','openpos'),
-                                    __('Email','openpos'),
-                                    __('Sold Total','openpos'),
-                                    __('Sold QTY','openpos'),
-                                );
-                            }else{
-                               
-                                if($report_seller_id)
-                                {
-                                    $seller_name = 'Unknown';
-                                    $seller_user = get_user_by('id',$report_seller_id);
-                                    
-                                    
-                                    if($seller_user)
-                                    {
-                                        $seller_user_data = $seller_user->data;
-                                        $seller_name = $seller_user_data->user_nicename ? $seller_user_data->user_nicename : $seller_user_data->user_login;
-                                    }
-                                    
-                                    $orders_export_data[] = array(
-                                        __('User','openpos'),
-                                        $seller_name,
-                                       '',
-                                       '',
-                                       '',
-                                    );
-                                }
-                               
-                                $orders_export_data[] = array(
-                                    __('Order','openpos'),
-                                    __('Grand Total','openpos'),
-                                    __('Seller Amount','openpos'),
-                                    __('Cashier','openpos'),
-                                    __('Created At','openpos')
-                                );
-                            }
-                            
-                            if($report_seller_id && !$is_all)
-                            {
-                                
-                                $chart_data[] = array(
-                                    __('Date','openpos'),
-                                    __('Sales','openpos')
-                                );
-                                foreach($ranges['ranges'] as $r)
-                                {
-    
-                                    $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
-                                    $total_sales = 0;
-                                    foreach($sales as $s)
-                                    {
-                                        $order = new WC_Order($s->ID);
-                                        $items = $order->get_items();
-                                        $_op_sale_by_person_id = get_post_meta($s->ID,'_op_sale_by_person_id',true);
-                                        $_op_sale_by_cashier_id = get_post_meta($s->ID,'_op_sale_by_cashier_id',true);
-                                        if(!$_op_sale_by_person_id)
-                                        {
-                                            $_op_sale_by_person_id = $_op_sale_by_cashier_id;
-                                        }
-    
-                                        if($report_seller_id == $_op_sale_by_person_id)
-                                        {
-                                            $partial_sale = 0;
-                                            $has_parital = false;
-                                            foreach($items as $item)
-                                            {
-                                                $_item_sale_id = $item->get_meta('_op_seller_id');
-                                                if($_item_sale_id > 0 && $_item_sale_id != $_op_sale_by_person_id)
-                                                {
-                                                    $has_parital = true;
-                                                }
-                                                if($_item_sale_id && $_item_sale_id == $report_seller_id)
-                                                {
-                                                    $item_data = $item->get_data();
-                                                    //$total_sales += $item_data['subtotal'];
-                                                    $partial_sale += $item_data['subtotal'];
-                                                }
-                                            }
-                                            if($has_parital)
-                                            {
-                                                $total_sales += $partial_sale;
-                                            }else{
-                                                $total_sales += $order->get_total() - $order->get_total_refunded();
-                                            }
-                                        }else{
-                                            foreach($items as $item)
-                                            {
-                                                $_item_sale_id = $item->get_meta('_op_seller_id');
-                                                if($_item_sale_id && $_item_sale_id == $report_seller_id)
-                                                {
-                                                    $item_data = $item->get_data();
-                                                    $total_sales += $item_data['subtotal'];
-                                                }
-                                            }
-                                        }
-                                    }
-    
-                                    $chart_data[] = array(
-                                        $r['label'],
-                                        $total_sales
-                                    );
-                                }
-                                $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
-                                $summary_data['total_order'] = count($orders);
-                                $summary_data['total_qty'] = 0;
-                                foreach($orders as $_order)
-                                {
-                                    $order = new WC_Order($_order->ID);
-                                    $items = $order->get_items();
-                                    $is_sale_by_seller = false;
-                                    $seller_order_sale = 0;
-                                    $_op_sale_by_person_id = get_post_meta($_order->ID,'_op_sale_by_person_id',true);
-    
-    
-                                    if($report_seller_id == $_op_sale_by_person_id)
-                                    {
-    
-                                        $partial_sale = 0;
-                                        $partial_all_qty = 0;
-                                        $partial_qty = 0;
-                                        $has_parital = false;
-                                        foreach($items as $item)
-                                        {
-                                            $_item_sale_id = $item->get_meta('_op_seller_id');
-                                            $item_qty = $item->get_quantity();
-                                            $partial_all_qty += $item_qty;
-    
-    
-                                            if($_item_sale_id > 0 && $_item_sale_id != $_op_sale_by_person_id)
-                                            {
-                                                $has_parital = true;
-                                            }
-                                            if( $_item_sale_id == $report_seller_id )
-                                            {
-                                                $item_data = $item->get_data();
-                                                $partial_sale += $item_data['subtotal'];
-                                                $partial_qty += $item_qty;
-                                            }
-                                        }
-    
-    
-                                        if(!$has_parital)
-                                        {
-                                            $is_sale_by_seller = true;
-                                            $seller_order_sale += $order->get_total() - $order->get_total_refunded();
-                                            $summary_data['total_sales'] += $order->get_total() - $order->get_total_refunded();
-                                            $summary_data['total_qty'] += $partial_all_qty;
-                                        }else{
-                                            if($partial_sale > 0)
-                                            {
-                                                $is_sale_by_seller = true;
-                                                $summary_data['total_sales'] += $partial_sale;
-                                                $summary_data['total_qty'] += $partial_qty;
-                                                $seller_order_sale += $partial_sale;
-                                            }
-    
-                                        }
-    
-                                    }else{
-                                        foreach($items as $item)
-                                        {
-                                            $_item_sale_id = $item->get_meta('_op_seller_id');
-                                            if($_item_sale_id && $_item_sale_id == $report_seller_id)
-                                            {
-                                                $is_sale_by_seller = true;
-                                                $item_data = $item->get_data();
-                                                $summary_data['total_sales'] += $item_data['subtotal'];
-                                                $seller_order_sale += $item_data['subtotal'];
-                                                $summary_data['total_qty'] += $item->get_quantity();
-                                            }
-                                        }
-                                    }
-    
-                                    if($is_sale_by_seller)
-                                    {
-                                        $created_at = $order->get_date_created();
-                                        $customer_id = $order->get_customer_id();
-                                        $post_author_id = get_post_field( 'post_author', $_order->ID );
-                                        $author =   get_userdata($post_author_id);
-                                        $author_name = 'Unknown';
-                                        if($author)
-                                        {
-                                            $author_name = $author->display_name;
-                                        }
-                                        $grand_total = $order->get_total() - $order->get_total_refunded();
-    
-                                        $orders_table_data[] = array(
-                                            $order->get_order_number(),
-                                            strip_tags(wc_price($grand_total)),
-                                            strip_tags(wc_price($seller_order_sale)),
-                                            $author_name,
-                                            wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ),
-                                            '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
-                                        );
-    
-                                        $tmp_export = array(
-                                            $order->get_order_number(),
-                                            $grand_total,
-                                            $seller_order_sale,
-                                            $author_name,
-                                            wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
-                                        );
-                                        $orders_export_data[] = $tmp_export;
-                                    }
-    
-                                }
-                                $summary_html = '';
-                                foreach($summary_data as $k => $v)
-                                {
-                                    if(in_array($k,array('total_sales','total_qty')))
-                                    {
-                                        $title =  __('Total Qty','openpos');
-                                        $value = $v;
-                                        if($k == 'total_sales')
-                                        {
-                                            $title =  __('Total Sales','openpos');
-                                            $value = wc_price($v);
-                                        }
-    
-                                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
-                                        $summary_html .= '<div class="summary-block">';
-                                        $summary_html .= '<dl>';
-                                        $summary_html .= '<dt>'.$title.'</dt>';
-                                        $summary_html .= '<dd>'.$value.'</dd>';
-                                        $summary_html .= '</dl>';
-                                        $summary_html .= '</div>';
-                                        $summary_html .= '</div>';
-                                    }
-                                }
-                            }
-                            if($is_all)
-                            {
-                                $all_sellers_id = array();
-    
-                                $all_seller_report = $op_report->getSaleBySellerReport($all_sellers_id,$ranges['start'],$ranges['end']);
-                                $summary_data = array(
-                                    'total_sales' => 0,
-                                    'total_qty' => 0,
-                                );
-                                foreach($all_seller_report as $user_id => $report_data)
-                                {
-                                    $summary_data['total_sales'] += $report_data['total_sale'];
-                                    $summary_data['total_qty'] += $report_data['total_qty'];
-                                    $user_name = __('Unknown');
-                                    $user_email = __('Unknown');
-                                    if($user_id)
-                                    {
-                                        $author_obj = get_user_by('id', $user_id);
-                                        if($author_obj)
-                                        {
-                                            $user_name = $author_obj->user_nicename ? $author_obj->user_nicename : $author_obj->user_login;
-                                            $user_email = $author_obj->user_email;
-                                        }
-    
-                                    }
-                                    $orders_table_data[] = array(
-                                        $user_name,
-                                        $user_email,
-                                        wc_price($report_data['total_sale']),
-                                        $report_data['total_qty'],
-                                    );
-                                    $tmp_export = array(
-                                        $user_name,
-                                        $user_email,
-                                        $report_data['total_sale'],
-                                        $report_data['total_qty'],
-                                    );
-                                    $orders_export_data[] = $tmp_export;
-                                }
-                                
-                                $summary_html = '';
-    
-                                foreach($summary_data as $k => $v)
-                                {
-                                    if(in_array($k,array('total_sales','total_qty')))
-                                    {
-                                        $title =  __('Total Qty','openpos');
-                                        $value = $v;
-                                        if($k == 'total_sales')
-                                        {
-                                            $title =  __('Total Sales','openpos');
-                                            $value = wc_price($v);
-                                        }
-    
-                                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3" style="margin-bottom: 15px;">';
-                                        $summary_html .= '<div class="summary-block">';
-                                        $summary_html .= '<dl>';
-                                        $summary_html .= '<dt>'.$title.'</dt>';
-                                        $summary_html .= '<dd>'.$value.'</dd>';
-                                        $summary_html .= '</dl>';
-                                        $summary_html .= '</div>';
-                                        $summary_html .= '</div>';
-                                    }
-                                }
-                                
-                            }
-    
-                            break;
-                        case 'sale_by_payment':
-                            $report_payment = isset($_REQUEST['report_payment']) ? $_REQUEST['report_payment'] : '';
-                            $table_label = array(
-                                __('Order','openpos'),
-                                __('Grand Total','openpos'),
-                                __('Method Amount','openpos').'('.$report_payment.')',
-                                __('Cashier','openpos'),
-                                __('Created At','openpos'),
-                                __('View','openpos'),
-                            );
-                            $orders_export_data[] = array(
-                                __('Order','openpos'),
-                                __('Grand Total','openpos'),
-                                __('Method Amount','openpos').'('.$report_payment.')',
-                                __('Cashier','openpos'),
                                 __('Created At','openpos')
                             );
-    
-    
+                           
+                            
+                        }
+
+                        if($report_seller_id && !$is_all)
+                        {
                             $chart_data[] = array(
                                 __('Date','openpos'),
                                 __('Sales','openpos')
                             );
-                            if($report_payment)
-                            {
-                                foreach($ranges['ranges'] as $r)
-                                {
-    
-                                    if($report_register_id > 0)
-                                    {
-                                        $sales = $this->core->getPosRegisterOrderByDate($report_register_id,$r['from'],$r['to']);
-                                    }elseif($report_outlet_id > 0){
-                                        $sales = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$r['from'],$r['to']);
-                                    }else{
-                                        $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
-                                    }
-    
-                                    $total_sales = 0;
-                                    foreach($sales as $s)
-                                    {
-                                        $payment_methods = get_post_meta($s->ID,'_op_payment_methods',true);
-                                        $transactions = $op_transaction->getOrderTransactions($s->ID);
-                                        if($payment_methods && !empty($transactions))
-                                        {
-                                            foreach($transactions as $payment_method)
-                                            {
-                                               
-                                                $payment_code = $payment_method['payment_code'];
-                                                if($payment_code == $report_payment)
-                                                {
-                                                    $paid = isset($payment_method['in_amount']) ? (float)$payment_method['in_amount'] : 0;
-                                                    $return_paid = isset($payment_method['out_amount']) ? (float)$payment_method['out_amount'] : 0;
-                                                    
-                                                    $total_sales += ($paid - $return_paid);
-                                                }
-                                            }
-                                        }
-    
-                                    }
-    
-                                    $chart_data[] = array(
-                                        $r['label'],
-                                        $total_sales
-                                    );
-                                }
-                                if($report_register_id > 0)
-                                {
-                                    $orders = $this->core->getPosRegisterOrderByDate($report_register_id,$ranges['start'],$ranges['end']);
-                                }elseif($report_outlet_id > 0){
-                                    $orders = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$ranges['start'],$ranges['end']);
-                                }else{
-                                    $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
-                                }
-    
-    
-                                $summary_data['total_order'] = 0;
-                                foreach($orders as $_order)
-                                {
-                                    $order = new WC_Order($_order->ID);
-    
-                                    $payment_methods = get_post_meta($_order->ID,'_op_payment_methods',true);
-                                    $transactions = $op_transaction->getOrderTransactions($_order->ID);
-                                    
-                                    if($payment_methods && is_array($transactions))
-                                    {
-    
-                                        $order_payments = array();
-                                        foreach($transactions as $payment_method)
-                                        {
-                                            $payment_code = $payment_method['payment_code'];
-                                            $paid = isset($payment_method['in_amount']) ? (float)$payment_method['in_amount'] : 0;
-                                            $return_paid = isset($payment_method['out_amount']) ? (float)$payment_method['out_amount'] : 0;
-                                            if(!isset($order_payments[$payment_code])){
-                                                $order_payments[$payment_code] = array(
-                                                    'in_amount' => $paid,
-                                                    'out_amount' => $return_paid
-                                                );
-                                            }else{
-                                                $order_payments[$payment_code]['in_amount'] += $paid;
-                                                $order_payments[$payment_code]['out_amount'] += $return_paid;
-                                            }
-                                        }
-    
-                                        foreach($order_payments as $payment_code => $payment_method)
-                                        {
-                                            //$payment_code = $payment_method['payment_code'];
-                                            if($payment_code == $report_payment)
-                                            {
-                                                $summary_data['total_order']++;
-                                                $paid = isset($payment_method['in_amount']) ? (float)$payment_method['in_amount'] : 0;
-                                                $return_paid = isset($payment_method['out_amount']) ? (float)$payment_method['out_amount'] : 0;
-                                                $paid -=  $return_paid;
-                                                
-                                                $created_at = $order->get_date_created();
-                                                $post_author_id = get_post_field( 'post_author', $_order->ID );
-                                                $author =   get_userdata($post_author_id);
-                                                $author_name = 'Unknown';
-                                                if($author)
-                                                {
-                                                    $author_name = $author->display_name;
-                                                }
-                                                $grand_total = $order->get_total() - $order->get_total_refunded();
-                                                $summary_data['total_sales'] += $paid;
-                                                $orders_table_data[] = array(
-                                                    $order->get_order_number(),
-                                                    strip_tags(wc_price($grand_total)),
-                                                    strip_tags(wc_price($paid)),
-                                                    $author_name,
-                                                    wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
-                                                    '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
-                                                );
-    
-                                                $tmp_export = array(
-                                                    $order->get_order_number(),
-                                                    $grand_total,
-                                                    $paid,
-                                                    $author_name,
-                                                    wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
-                                                );
-                                                $orders_export_data[] = $tmp_export;
-                                            }
-                                        }
-                                    }
-    
-    
-                                }
-                                $summary_html = '';
-                                foreach($summary_data as $k => $v)
-                                {
-                                    if(in_array($k,array('total_sales','total_order')))
-                                    {
-                                        $title =  __('Total Orders','openpos');
-                                        $value = $v;
-                                        if($k == 'total_sales')
-                                        {
-                                            $title =  __('Total Sales','openpos');
-                                            $value = wc_price($v);
-                                        }
-    
-                                        $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
-                                        $summary_html .= '<div class="summary-block">';
-                                        $summary_html .= '<dl>';
-                                        $summary_html .= '<dt>'.$title.'</dt>';
-                                        $summary_html .= '<dd>'.$value.'</dd>';
-                                        $summary_html .= '</dl>';
-                                        $summary_html .= '</div>';
-                                        $summary_html .= '</div>';
-                                    }
-                                }
-                            }
-                            break;
-                        case 'sales':
-                            $orders_export_data[] = array(
-                                __('#','openpos'),
-                                __('Grand Total','openpos'),
-                                __('Profit Total','openpos'),
-                                __('Tip Total','openpos'),
-                                __('Cashier','openpos'),
-                                __('Created At','openpos')
-                            );
-                            $chart_data[] = array(
-                                __('Date','openpos'),
-                                __('Sales','openpos'),
-                                __('Commsion','openpos'),
-                            );
                             foreach($ranges['ranges'] as $r)
                             {
-    
-                                if($report_register_id > 0)
-                                {
-                                    $sales = $this->core->getPosRegisterOrderByDate($report_register_id,$r['from'],$r['to']);
-                                }elseif($report_outlet_id > 0){
-                                    $sales = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$r['from'],$r['to']);
-                                }else{
-                                    $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
-                                }
-    
+
+                                $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
                                 $total_sales = 0;
-                                $total_commsion = 0;
                                 foreach($sales as $s)
                                 {
                                     $order = new WC_Order($s->ID);
-                                    $total_sales += $order->get_total()- $order->get_total_refunded();
-                                    $total_commsion += $op_report->getSaleCommision($order);
+                                    $items = $order->get_items();
+
+                                    $_agent_sale_id = $order->get_meta('_op_sale_by_cashier_id');
+
+                                    if($_agent_sale_id && $_agent_sale_id == $report_seller_id)
+                                    {
+
+                                        $total_sales += $order->get_total() - $order->get_total_refunded();
+                                    }
+
                                 }
-    
+
                                 $chart_data[] = array(
                                     $r['label'],
-                                    $total_sales,
-                                    $total_commsion,
+                                    $total_sales
                                 );
                             }
-                            if($report_register_id > 0)
-                            {
-                                $orders = $this->core->getPosRegisterOrderByDate($report_register_id,$ranges['start'],$ranges['end']);
-                            }elseif($report_outlet_id > 0){
-                                $orders = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$ranges['start'],$ranges['end']);
-                            }else{
-                                $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
-                            }
-    
-    
+                            $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
                             $summary_data['total_order'] = count($orders);
-                            $summary_data['total_commision'] = 0;
-                            $summary_data['total_tip'] = 0;
+                            $summary_data['total_qty']  = 0;
+                            $summary_data['total_tip']  = 0;
                             foreach($orders as $_order)
                             {
                                 $order = new WC_Order($_order->ID);
-                                $created_at = $order->get_date_created();
-                                $customer_id = $order->get_customer_id();
-                                $post_author_id = get_post_field( 'post_author', $_order->ID );
-                                $author =   get_userdata($post_author_id);
-                                $author_name = 'Unknown';
-                                if($author)
+                                $items = $order->get_items();
+                                $is_sale_by_seller = false;
+                                $seller_order_sale = 0;
+                                $_agent_sale_id = $order->get_meta('_op_sale_by_cashier_id');
+
+                                if($_agent_sale_id && $_agent_sale_id == $report_seller_id)
                                 {
-                                    $author_name = $author->display_name;
+                                    $is_sale_by_seller = true;
+                                    $summary_data['total_sales'] += $order->get_total() - $order->get_total_refunded();
+                                    $seller_order_sale += $order->get_total();
+
+                                    $tip_total =$op_report->getSaleTip($order);
+                                    $summary_data['total_tip']  +=  $tip_total;
+
+                                    foreach($items as $item)
+                                    {
+                                       $summary_data['total_qty'] += $item->get_quantity();
+                                    }
+
+
+                                    $created_at = $order->get_date_created();
+
+                                    $post_author_id = $_agent_sale_id;
+                                    $author =   get_userdata($post_author_id);
+                                    $author_name = 'Unknown';
+                                    if($author)
+                                    {
+                                        $author_name = $author->display_name;
+                                    }
+                                    $grand_total = $order->get_total() - $order->get_total_refunded();
+
+                                    $orders_table_data[] = array(
+                                        $order->get_order_number(),
+                                        strip_tags(wc_price($grand_total)),
+                                        strip_tags(wc_price($seller_order_sale)),
+                                        strip_tags(wc_price($tip_total )),
+                                        $author_name,
+                                        wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
+                                        '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
+                                    );
+
+                                    $tmp_export = array(
+                                        $order->get_order_number(),
+                                        $grand_total,
+                                        $seller_order_sale,
+                                        $tip_total,
+                                        $author_name,
+                                        wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
+                                    );
+                                    $orders_export_data[] = $tmp_export;
                                 }
-                               
-                                $grand_total = $order->get_total() - $order->get_total_refunded();
-                                $commision_total = $op_report->getSaleCommision($order);
-                                $tip_total =$op_report->getSaleTip($order);
-                                $summary_data['total_sales'] += $grand_total;
-                                $summary_data['total_commision'] += $commision_total;
-                                $summary_data['total_tip'] += $tip_total;
-                                $orders_table_data[] = array(
-                                    $order->get_order_number(),
-                                    strip_tags(wc_price($grand_total)),
-                                    strip_tags(wc_price($commision_total)),
-                                    strip_tags(wc_price($tip_total)),
-                                    $author_name,
-                                    wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
-                                    '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
-                                );
-    
-                                $tmp_export = array(
-                                    $order->get_order_number(),
-                                    $grand_total,
-                                    $commision_total,
-                                    $tip_total,
-                                    $author_name,
-                                    wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
-                                );
-                                $orders_export_data[] = $tmp_export;
+
+
                             }
                             $summary_html = '';
-                           
                             foreach($summary_data as $k => $v)
                             {
-                                if(in_array($k,array('total_sales','total_order','total_commision','total_tip')))
+                                if(in_array($k,array('total_sales','total_qty','total_tip')))
                                 {
-                                    $title =  __('Total Orders','openpos');
+                                    $title =  __('Total Qty','openpos');
                                     $value = $v;
                                     if($k == 'total_sales')
                                     {
                                         $title =  __('Total Sales','openpos');
                                         $value = wc_price($v);
                                     }
-                                    if($k == 'total_commision')
-                                    {
-                                        $title =  __('Total Commsion','openpos');
-                                        $value = wc_price($v);
-                                    }
                                     if($k == 'total_tip')
                                     {
-                                        $title =  __('Total TIP','openpos');
+                                        $title =  __('Total Tip','openpos');
                                         $value = wc_price($v);
                                     }
-                                    
-    
+
                                     $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
                                     $summary_html .= '<div class="summary-block">';
                                     $summary_html .= '<dl>';
@@ -4105,12 +3403,477 @@ class Openpos_Admin{
                                     $summary_html .= '</div>';
                                 }
                             }
-                            break;
-                        case 'sale_by_product':
-                            $orders_table_data = array();
-                            $orders_export_data = array();
+                        }
+                        if($is_all)
+                        {
+
+                            $all_sellers_id = array();
+
+                            $all_seller_report = $op_report->getSaleByCashierReport($all_sellers_id,$ranges['start'],$ranges['end']);
+                            $summary_data = array(
+                                'total_sales' => 0,
+                                'total_qty' => 0,
+                                'total_order' => 0,
+                                'total_tip' => 0,
+                            );
+                            foreach($all_seller_report as $user_id => $report_data)
+                            {
+                                $summary_data['total_sales'] += $report_data['total_sale'];
+                                $summary_data['total_qty'] += $report_data['total_qty'];
+                                $summary_data['total_order'] += $report_data['total_order'];
+                                $summary_data['total_tip'] += $report_data['total_tip'];
+                                $user_name = __('Unknown');
+                                $user_email = __('Unknown');
+                                if($user_id)
+                                {
+                                    $author_obj = get_user_by('id', $user_id);
+                                    if($author_obj)
+                                    {
+                                        $user_name = $author_obj->user_nicename ? $author_obj->user_nicename : $author_obj->user_login;
+                                        $user_email = $author_obj->user_email;
+                                    }
+
+                                }
+                                $orders_table_data[] = array(
+                                    $user_name,
+                                    $user_email,
+                                    wc_price($report_data['total_sale']),
+                                    $report_data['total_qty'],
+                                    $report_data['total_order'],
+                                    $report_data['total_tip'],
+                                );
+                                $tmp_export = array(
+                                    $user_name,
+                                    $user_email,
+                                    $report_data['total_sale'],
+                                    $report_data['total_qty'],
+                                    $report_data['total_order'],
+                                    $report_data['total_tip'],
+                                );
+                                $orders_export_data[] = $tmp_export;
+                            }
+                            
                             $summary_html = '';
-                            $is_all = false;
+
+                            foreach($summary_data as $k => $v)
+                            {
+                                if(in_array($k,array('total_sales','total_qty','total_order','total_tip')))
+                                {
+                                    $title =  __('Total Qty','openpos');
+                                    $value = $v;
+                                    if($k == 'total_sales')
+                                    {
+                                        $title =  __('Total Sales','openpos');
+                                        $value = wc_price($v);
+                                    }
+                                    if($k == 'total_tip')
+                                    {
+                                        $title =  __('Total Tip','openpos');
+                                        $value = wc_price($v);
+                                    }
+                                    if($k == 'total_order')
+                                    {
+                                        $title =  __('Total Orders','openpos');
+                                       
+                                    }
+                                    $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3" style="margin-bottom: 15px;">';
+                                    $summary_html .= '<div class="summary-block">';
+                                    $summary_html .= '<dl>';
+                                    $summary_html .= '<dt>'.$title.'</dt>';
+                                    $summary_html .= '<dd>'.$value.'</dd>';
+                                    $summary_html .= '</dl>';
+                                    $summary_html .= '</div>';
+                                    $summary_html .= '</div>';
+                                }
+                            }
+                        }
+
+                        break;
+                    case 'sale_by_seller':
+                        $table_label = array(
+                            __('Order','openpos'),
+                            __('Grand Total','openpos'),
+                            __('Seller Amount','openpos'),
+                            __('Cashier','openpos'),
+                            __('Created At','openpos'),
+                            __('View','openpos'),
+                        );
+                       
+                        $is_all = false;
+                        $orders_export_data = array();
+                        if($report_seller_id == '_all')
+                        {
+                            $is_all = true;
+                            $table_label = array(
+                                __('User','openpos'),
+                                __('Email','openpos'),
+                                __('Sold Total','openpos'),
+                                __('Sold QTY','openpos'),
+                            );
+                            $orders_export_data[] = array(
+                                __('User','openpos'),
+                                __('Email','openpos'),
+                                __('Sold Total','openpos'),
+                                __('Sold QTY','openpos'),
+                            );
+                        }else{
+                           
+                            if($report_seller_id)
+                            {
+                                $seller_name = 'Unknown';
+                                $seller_user = get_user_by('id',$report_seller_id);
+                                
+                                
+                                if($seller_user)
+                                {
+                                    $seller_user_data = $seller_user->data;
+                                    $seller_name = $seller_user_data->user_nicename ? $seller_user_data->user_nicename : $seller_user_data->user_login;
+                                }
+                                
+                                $orders_export_data[] = array(
+                                    __('User','openpos'),
+                                    $seller_name,
+                                   '',
+                                   '',
+                                   '',
+                                );
+                            }
+                           
+                            $orders_export_data[] = array(
+                                __('Order','openpos'),
+                                __('Grand Total','openpos'),
+                                __('Seller Amount','openpos'),
+                                __('Cashier','openpos'),
+                                __('Created At','openpos')
+                            );
+                        }
+                        
+                        if($report_seller_id && !$is_all)
+                        {
+                            
+                            $chart_data[] = array(
+                                __('Date','openpos'),
+                                __('Sales','openpos')
+                            );
+                            foreach($ranges['ranges'] as $r)
+                            {
+
+                                $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
+                                $total_sales = 0;
+                                foreach($sales as $s)
+                                {
+                                    $order = new WC_Order($s->ID);
+                                    $items = $order->get_items();
+                                    $_op_sale_by_person_id = get_post_meta($s->ID,'_op_sale_by_person_id',true);
+                                    $_op_sale_by_cashier_id = get_post_meta($s->ID,'_op_sale_by_cashier_id',true);
+                                    if(!$_op_sale_by_person_id)
+                                    {
+                                        $_op_sale_by_person_id = $_op_sale_by_cashier_id;
+                                    }
+
+                                    if($report_seller_id == $_op_sale_by_person_id)
+                                    {
+                                        $partial_sale = 0;
+                                        $has_parital = false;
+                                        foreach($items as $item)
+                                        {
+                                            $_item_sale_id = $item->get_meta('_op_seller_id');
+                                            if($_item_sale_id > 0 && $_item_sale_id != $_op_sale_by_person_id)
+                                            {
+                                                $has_parital = true;
+                                            }
+                                            if($_item_sale_id && $_item_sale_id == $report_seller_id)
+                                            {
+                                                $item_data = $item->get_data();
+                                                //$total_sales += $item_data['subtotal'];
+                                                $partial_sale += $item_data['subtotal'];
+                                            }
+                                        }
+                                        if($has_parital)
+                                        {
+                                            $total_sales += $partial_sale;
+                                        }else{
+                                            $total_sales += $order->get_total() - $order->get_total_refunded();
+                                        }
+                                    }else{
+                                        foreach($items as $item)
+                                        {
+                                            $_item_sale_id = $item->get_meta('_op_seller_id');
+                                            if($_item_sale_id && $_item_sale_id == $report_seller_id)
+                                            {
+                                                $item_data = $item->get_data();
+                                                $total_sales += $item_data['subtotal'];
+                                            }
+                                        }
+                                    }
+                                }
+
+                                $chart_data[] = array(
+                                    $r['label'],
+                                    $total_sales
+                                );
+                            }
+                            $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
+                            $summary_data['total_order'] = count($orders);
+                            $summary_data['total_qty'] = 0;
+                            foreach($orders as $_order)
+                            {
+                                $order = new WC_Order($_order->ID);
+                                $items = $order->get_items();
+                                $is_sale_by_seller = false;
+                                $seller_order_sale = 0;
+                                $_op_sale_by_person_id = get_post_meta($_order->ID,'_op_sale_by_person_id',true);
+
+
+                                if($report_seller_id == $_op_sale_by_person_id)
+                                {
+
+                                    $partial_sale = 0;
+                                    $partial_all_qty = 0;
+                                    $partial_qty = 0;
+                                    $has_parital = false;
+                                    foreach($items as $item)
+                                    {
+                                        $_item_sale_id = $item->get_meta('_op_seller_id');
+                                        $item_qty = $item->get_quantity();
+                                        $partial_all_qty += $item_qty;
+
+
+                                        if($_item_sale_id > 0 && $_item_sale_id != $_op_sale_by_person_id)
+                                        {
+                                            $has_parital = true;
+                                        }
+                                        if( $_item_sale_id == $report_seller_id )
+                                        {
+                                            $item_data = $item->get_data();
+                                            $partial_sale += $item_data['subtotal'];
+                                            $partial_qty += $item_qty;
+                                        }
+                                    }
+
+
+                                    if(!$has_parital)
+                                    {
+                                        $is_sale_by_seller = true;
+                                        $seller_order_sale += $order->get_total() - $order->get_total_refunded();
+                                        $summary_data['total_sales'] += $order->get_total() - $order->get_total_refunded();
+                                        $summary_data['total_qty'] += $partial_all_qty;
+                                    }else{
+                                        if($partial_sale > 0)
+                                        {
+                                            $is_sale_by_seller = true;
+                                            $summary_data['total_sales'] += $partial_sale;
+                                            $summary_data['total_qty'] += $partial_qty;
+                                            $seller_order_sale += $partial_sale;
+                                        }
+
+                                    }
+
+                                }else{
+                                    foreach($items as $item)
+                                    {
+                                        $_item_sale_id = $item->get_meta('_op_seller_id');
+                                        if($_item_sale_id && $_item_sale_id == $report_seller_id)
+                                        {
+                                            $is_sale_by_seller = true;
+                                            $item_data = $item->get_data();
+                                            $summary_data['total_sales'] += $item_data['subtotal'];
+                                            $seller_order_sale += $item_data['subtotal'];
+                                            $summary_data['total_qty'] += $item->get_quantity();
+                                        }
+                                    }
+                                }
+
+                                if($is_sale_by_seller)
+                                {
+                                    $created_at = $order->get_date_created();
+                                    $customer_id = $order->get_customer_id();
+                                    $post_author_id = get_post_field( 'post_author', $_order->ID );
+                                    $author =   get_userdata($post_author_id);
+                                    $author_name = 'Unknown';
+                                    if($author)
+                                    {
+                                        $author_name = $author->display_name;
+                                    }
+                                    $grand_total = $order->get_total() - $order->get_total_refunded();
+
+                                    $orders_table_data[] = array(
+                                        $order->get_order_number(),
+                                        strip_tags(wc_price($grand_total)),
+                                        strip_tags(wc_price($seller_order_sale)),
+                                        $author_name,
+                                        wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ),
+                                        '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
+                                    );
+
+                                    $tmp_export = array(
+                                        $order->get_order_number(),
+                                        $grand_total,
+                                        $seller_order_sale,
+                                        $author_name,
+                                        wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
+                                    );
+                                    $orders_export_data[] = $tmp_export;
+                                }
+
+                            }
+                            $summary_html = '';
+                            foreach($summary_data as $k => $v)
+                            {
+                                if(in_array($k,array('total_sales','total_qty')))
+                                {
+                                    $title =  __('Total Qty','openpos');
+                                    $value = $v;
+                                    if($k == 'total_sales')
+                                    {
+                                        $title =  __('Total Sales','openpos');
+                                        $value = wc_price($v);
+                                    }
+
+                                    $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
+                                    $summary_html .= '<div class="summary-block">';
+                                    $summary_html .= '<dl>';
+                                    $summary_html .= '<dt>'.$title.'</dt>';
+                                    $summary_html .= '<dd>'.$value.'</dd>';
+                                    $summary_html .= '</dl>';
+                                    $summary_html .= '</div>';
+                                    $summary_html .= '</div>';
+                                }
+                            }
+                        }
+                        if($is_all)
+                        {
+                            $all_sellers_id = array();
+
+                            $all_seller_report = $op_report->getSaleBySellerReport($all_sellers_id,$ranges['start'],$ranges['end']);
+                            $summary_data = array(
+                                'total_sales' => 0,
+                                'total_qty' => 0,
+                            );
+                            foreach($all_seller_report as $user_id => $report_data)
+                            {
+                                $summary_data['total_sales'] += $report_data['total_sale'];
+                                $summary_data['total_qty'] += $report_data['total_qty'];
+                                $user_name = __('Unknown');
+                                $user_email = __('Unknown');
+                                if($user_id)
+                                {
+                                    $author_obj = get_user_by('id', $user_id);
+                                    if($author_obj)
+                                    {
+                                        $user_name = $author_obj->user_nicename ? $author_obj->user_nicename : $author_obj->user_login;
+                                        $user_email = $author_obj->user_email;
+                                    }
+
+                                }
+                                $orders_table_data[] = array(
+                                    $user_name,
+                                    $user_email,
+                                    wc_price($report_data['total_sale']),
+                                    $report_data['total_qty'],
+                                );
+                                $tmp_export = array(
+                                    $user_name,
+                                    $user_email,
+                                    $report_data['total_sale'],
+                                    $report_data['total_qty'],
+                                );
+                                $orders_export_data[] = $tmp_export;
+                            }
+                            
+                            $summary_html = '';
+
+                            foreach($summary_data as $k => $v)
+                            {
+                                if(in_array($k,array('total_sales','total_qty')))
+                                {
+                                    $title =  __('Total Qty','openpos');
+                                    $value = $v;
+                                    if($k == 'total_sales')
+                                    {
+                                        $title =  __('Total Sales','openpos');
+                                        $value = wc_price($v);
+                                    }
+
+                                    $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3" style="margin-bottom: 15px;">';
+                                    $summary_html .= '<div class="summary-block">';
+                                    $summary_html .= '<dl>';
+                                    $summary_html .= '<dt>'.$title.'</dt>';
+                                    $summary_html .= '<dd>'.$value.'</dd>';
+                                    $summary_html .= '</dl>';
+                                    $summary_html .= '</div>';
+                                    $summary_html .= '</div>';
+                                }
+                            }
+                            
+                        }
+
+                        break;
+                    case 'sale_by_payment':
+                        $report_payment = isset($_REQUEST['report_payment']) ? $_REQUEST['report_payment'] : '';
+                        $table_label = array(
+                            __('Order','openpos'),
+                            __('Grand Total','openpos'),
+                            __('Method Amount','openpos').'('.$report_payment.')',
+                            __('Cashier','openpos'),
+                            __('Created At','openpos'),
+                            __('View','openpos'),
+                        );
+                        $orders_export_data[] = array(
+                            __('Order','openpos'),
+                            __('Grand Total','openpos'),
+                            __('Method Amount','openpos').'('.$report_payment.')',
+                            __('Cashier','openpos'),
+                            __('Created At','openpos')
+                        );
+
+
+                        $chart_data[] = array(
+                            __('Date','openpos'),
+                            __('Sales','openpos')
+                        );
+                        if($report_payment)
+                        {
+                            foreach($ranges['ranges'] as $r)
+                            {
+
+                                if($report_register_id > 0)
+                                {
+                                    $sales = $this->core->getPosRegisterOrderByDate($report_register_id,$r['from'],$r['to']);
+                                }elseif($report_outlet_id > 0){
+                                    $sales = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$r['from'],$r['to']);
+                                }else{
+                                    $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
+                                }
+
+                                $total_sales = 0;
+                                foreach($sales as $s)
+                                {
+                                    $payment_methods = get_post_meta($s->ID,'_op_payment_methods',true);
+                                    $transactions = $op_transaction->getOrderTransactions($s->ID);
+                                    if($payment_methods && !empty($transactions))
+                                    {
+                                        foreach($transactions as $payment_method)
+                                        {
+                                           
+                                            $payment_code = $payment_method['payment_code'];
+                                            if($payment_code == $report_payment)
+                                            {
+                                                $paid = isset($payment_method['in_amount']) ? (float)$payment_method['in_amount'] : 0;
+                                                $return_paid = isset($payment_method['out_amount']) ? (float)$payment_method['out_amount'] : 0;
+                                                
+                                                $total_sales += ($paid - $return_paid);
+                                            }
+                                        }
+                                    }
+
+                                }
+
+                                $chart_data[] = array(
+                                    $r['label'],
+                                    $total_sales
+                                );
+                            }
                             if($report_register_id > 0)
                             {
                                 $orders = $this->core->getPosRegisterOrderByDate($report_register_id,$ranges['start'],$ranges['end']);
@@ -4118,208 +3881,422 @@ class Openpos_Admin{
                                 $orders = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$ranges['start'],$ranges['end']);
                             }else{
                                 $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
-                                $is_all = true;
                             }
-                            $table_label = array(
-                                __('Product','openpos'),
-                                __('SKU','openpos'),
-                                __('QTY','openpos'),
-                                __('Sale','openpos'),
-                                __('Profit','openpos'),
-                            );
-                            $orders_export_data[] = array(
-                                __('Product','openpos'),
-                                __('SKU','openpos'),
-                                __('QTY','openpos'),
-                                __('Sale','openpos'),
-                                __('Profit','openpos'),
-                            );
-    
-                            $summary_html.= '<div class="container-fluid"><div class="row"><div class="col-md-12">';
-                            $summary_html.= '<table class="table table-bordered">';
-                            $summary_html.= '<tr>';
-                            $summary_html.= '<th>'.__('Product','openpos').'</th>';
-                            $summary_html.= '<th>'.__('SKU','openpos').'</th>';
-                            $summary_html.= '<th>'.__('QTY','openpos').'</th>';
-                            $summary_html.= '<th>'.__('Sale','openpos').'</th>';
-                            $summary_html.= '<th>'.__('Profit','openpos').'</th>';
-                            $summary_html.= '</tr>';
-    
-                            $item_data = array();
-                            $custom_item_data = array();
-    
-                            foreach($orders as $_order) {
+
+
+                            $summary_data['total_order'] = 0;
+                            foreach($orders as $_order)
+                            {
                                 $order = new WC_Order($_order->ID);
-                                $items = $order->get_items();
-                                foreach($items as $item)
+
+                                $payment_methods = get_post_meta($_order->ID,'_op_payment_methods',true);
+                                $transactions = $op_transaction->getOrderTransactions($_order->ID);
+                                
+                                if($payment_methods && is_array($transactions))
                                 {
-                                    $product = $item->get_product();
-                                    $order_item_data = $item->get_data();
-                                    if($product)
+// TRG -2 START
+                                    foreach($transactions as $payment_method)
                                     {
-                                        $id = $product->get_id();
-                                        $sku = $product->get_sku();
-                                        $item_qty = $item->get_quantity();
-                                        
-                                        $item_sales =  $order_item_data['total'];
-                                        $metas = $item->get_meta_data();
-                                        //$sub_total = $item_data['subtotal'];
-                                        
-                                        $cost_price = 0;
-                                        
-                                        foreach($metas as $meta)
+                                        $payment_code = $payment_method['payment_code'];
+// TRG -2  END 
+                                        if($payment_code == $report_payment)
                                         {
-                                            if($meta->key == '_op_cost_price' && $meta->value)
+                                            $summary_data['total_order']++;
+                                            $paid = isset($payment_method['in_amount']) ? (float)$payment_method['in_amount'] : 0;
+                                            $return_paid = isset($payment_method['out_amount']) ? (float)$payment_method['out_amount'] : 0;
+                                            $paid -=  $return_paid;
+                                            
+                                            $created_at = $order->get_date_created();
+                                            $post_author_id = get_post_field( 'post_author', $_order->ID );
+                                            $author =   get_userdata($post_author_id);
+                                            $author_name = 'Unknown';
+                                            if($author)
                                             {
-                                                $cost_price = $meta->value; 
-                                                if(is_array($cost_price) || !is_numeric($cost_price))
-                                                {
-                                                    $cost_price = 0;
-                                                }
+                                                $author_name = $author->display_name;
+                                            }
+                                            $grand_total = $order->get_total() - $order->get_total_refunded();
+                                            $summary_data['total_sales'] += $paid;
+                                            $orders_table_data[] = array(
+                                                $order->get_order_number(),
+                                                strip_tags(wc_price($grand_total)),
+                                                strip_tags(wc_price($paid)),
+                                                $author_name,
+                                                wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
+                                                '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
+                                            );
+
+                                            $tmp_export = array(
+                                                $order->get_order_number(),
+                                                $grand_total,
+                                                $paid,
+                                                $author_name,
+                                                wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
+                                            );
+                                            $orders_export_data[] = $tmp_export;
+                                        }
+                                    }
+                                }
+
+
+                            }
+                            $summary_html = '';
+                            foreach($summary_data as $k => $v)
+                            {
+                                if(in_array($k,array('total_sales','total_order')))
+                                {
+                                    $title =  __('Total Orders','openpos');
+                                    $value = $v;
+                                    if($k == 'total_sales')
+                                    {
+                                        $title =  __('Total Sales','openpos');
+                                        $value = wc_price($v);
+                                    }
+
+                                    $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
+                                    $summary_html .= '<div class="summary-block">';
+                                    $summary_html .= '<dl>';
+                                    $summary_html .= '<dt>'.$title.'</dt>';
+                                    $summary_html .= '<dd>'.$value.'</dd>';
+                                    $summary_html .= '</dl>';
+                                    $summary_html .= '</div>';
+                                    $summary_html .= '</div>';
+                                }
+                            }
+                        }
+                        break;
+                    case 'sales':
+                        $orders_export_data[] = array(
+                            __('#','openpos'),
+                            __('Grand Total','openpos'),
+                            __('Profit Total','openpos'),
+                            __('Tip Total','openpos'),
+                            __('Cashier','openpos'),
+                            __('Created At','openpos')
+                        );
+                        $chart_data[] = array(
+                            __('Date','openpos'),
+                            __('Sales','openpos'),
+                            __('Commsion','openpos'),
+                        );
+                        foreach($ranges['ranges'] as $r)
+                        {
+
+                            if($report_register_id > 0)
+                            {
+                                $sales = $this->core->getPosRegisterOrderByDate($report_register_id,$r['from'],$r['to']);
+                            }elseif($report_outlet_id > 0){
+                                $sales = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$r['from'],$r['to']);
+                            }else{
+                                $sales = $this->core->getPosOrderByDate($r['from'],$r['to']);
+                            }
+
+                            $total_sales = 0;
+                            $total_commsion = 0;
+                            foreach($sales as $s)
+                            {
+                                $order = new WC_Order($s->ID);
+                                $total_sales += $order->get_total()- $order->get_total_refunded();
+                                $total_commsion += $op_report->getSaleCommision($order);
+                            }
+
+                            $chart_data[] = array(
+                                $r['label'],
+                                $total_sales,
+                                $total_commsion,
+                            );
+                        }
+                        if($report_register_id > 0)
+                        {
+                            $orders = $this->core->getPosRegisterOrderByDate($report_register_id,$ranges['start'],$ranges['end']);
+                        }elseif($report_outlet_id > 0){
+                            $orders = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$ranges['start'],$ranges['end']);
+                        }else{
+                            $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
+                        }
+
+
+                        $summary_data['total_order'] = count($orders);
+                        $summary_data['total_commision'] = 0;
+                        $summary_data['total_tip'] = 0;
+                        foreach($orders as $_order)
+                        {
+                            $order = new WC_Order($_order->ID);
+                            $created_at = $order->get_date_created();
+                            $customer_id = $order->get_customer_id();
+                            $post_author_id = get_post_field( 'post_author', $_order->ID );
+                            $author =   get_userdata($post_author_id);
+                            $author_name = 'Unknown';
+                            if($author)
+                            {
+                                $author_name = $author->display_name;
+                            }
+                           
+                            $grand_total = $order->get_total() - $order->get_total_refunded();
+                            $commision_total = $op_report->getSaleCommision($order);
+                            $tip_total =$op_report->getSaleTip($order);
+                            $summary_data['total_sales'] += $grand_total;
+                            $summary_data['total_commision'] += $commision_total;
+                            $summary_data['total_tip'] += $tip_total;
+                            $orders_table_data[] = array(
+                                $order->get_order_number(),
+                                strip_tags(wc_price($grand_total)),
+                                strip_tags(wc_price($commision_total)),
+                                strip_tags(wc_price($tip_total)),
+                                $author_name,
+                                wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) ) ,
+                                '<a target="_blank" href="'.esc_url($order->get_edit_order_url()).'">'.__( 'View', 'openpos' ) .'</a>'
+                            );
+
+                            $tmp_export = array(
+                                $order->get_order_number(),
+                                $grand_total,
+                                $commision_total,
+                                $tip_total,
+                                $author_name,
+                                wc_format_datetime( $created_at ).' '.wc_format_datetime( $created_at, get_option( 'time_format' ) )
+                            );
+                            $orders_export_data[] = $tmp_export;
+                        }
+                        $summary_html = '';
+                       
+                        foreach($summary_data as $k => $v)
+                        {
+                            if(in_array($k,array('total_sales','total_order','total_commision','total_tip')))
+                            {
+                                $title =  __('Total Orders','openpos');
+                                $value = $v;
+                                if($k == 'total_sales')
+                                {
+                                    $title =  __('Total Sales','openpos');
+                                    $value = wc_price($v);
+                                }
+                                if($k == 'total_commision')
+                                {
+                                    $title =  __('Total Commsion','openpos');
+                                    $value = wc_price($v);
+                                }
+                                if($k == 'total_tip')
+                                {
+                                    $title =  __('Total TIP','openpos');
+                                    $value = wc_price($v);
+                                }
+                                
+
+                                $summary_html .= '<div class="col-md-3 col-log-3 col-sm-3 col-xs-3">';
+                                $summary_html .= '<div class="summary-block">';
+                                $summary_html .= '<dl>';
+                                $summary_html .= '<dt>'.$title.'</dt>';
+                                $summary_html .= '<dd>'.$value.'</dd>';
+                                $summary_html .= '</dl>';
+                                $summary_html .= '</div>';
+                                $summary_html .= '</div>';
+                            }
+                        }
+                        break;
+                    case 'sale_by_product':
+                        $orders_table_data = array();
+                        $orders_export_data = array();
+                        $summary_html = '';
+                        $is_all = false;
+                        if($report_register_id > 0)
+                        {
+                            $orders = $this->core->getPosRegisterOrderByDate($report_register_id,$ranges['start'],$ranges['end']);
+                        }elseif($report_outlet_id > 0){
+                            $orders = $this->core->getPosWarehouseOrderByDate($report_outlet_id,$ranges['start'],$ranges['end']);
+                        }else{
+                            $orders = $this->core->getPosOrderByDate($ranges['start'],$ranges['end']);
+                            $is_all = true;
+                        }
+                        $table_label = array(
+                            __('Product','openpos'),
+// TRG -2 
+                            __('QTY','openpos'),
+                            __('Sale','openpos'),
+                            __('Profit','openpos'),
+                        );
+                        $orders_export_data[] = array(
+                            __('Product','openpos'),
+// TRG -2 
+                            __('QTY','openpos'),
+                            __('Sale','openpos'),
+                            __('Profit','openpos'),
+                        );
+
+                        $summary_html.= '<div class="container-fluid"><div class="row"><div class="col-md-12">';
+                        $summary_html.= '<table class="table table-bordered">';
+                        $summary_html.= '<tr>';
+                        $summary_html.= '<th>'.__('Product','openpos').'</th>';
+// TRG -2 
+                        $summary_html.= '<th>'.__('QTY','openpos').'</th>';
+                        $summary_html.= '<th>'.__('Sale','openpos').'</th>';
+                        $summary_html.= '<th>'.__('Profit','openpos').'</th>';
+                        $summary_html.= '</tr>';
+
+                        $item_data = array();
+                        $custom_item_data = array();
+
+                        foreach($orders as $_order) {
+                            $order = new WC_Order($_order->ID);
+                            $items = $order->get_items();
+                            foreach($items as $item)
+                            {
+                                $product = $item->get_product();
+                                $order_item_data = $item->get_data();
+                                if($product)
+                                {
+                                    $id = $product->get_id();
+// TRG -2 
+                                    $item_qty = $item->get_quantity();
+                                    
+                                    $item_sales =  $order_item_data['total'];
+                                    $metas = $item->get_meta_data();
+                                    //$sub_total = $item_data['subtotal'];
+                                    
+                                    $cost_price = 0;
+                                    
+                                    foreach($metas as $meta)
+                                    {
+                                        if($meta->key == '_op_cost_price' && $meta->value)
+                                        {
+                                            $cost_price = $meta->value; 
+                                            if(is_array($cost_price) || !is_numeric($cost_price))
+                                            {
+                                                $cost_price = 0;
                                             }
                                         }
-                                        $item_profit = $item_sales - ($cost_price * $item_qty);
-    
-                                        if(isset($item_data[$id]))
-                                        {
-                                            $item_data[$id]['qty'] += $item_qty;
-                                            $item_data[$id]['sale'] += $item_sales;
-                                            $item_data[$id]['profit'] += $item_profit;
-                                        }else{
-                                            $item_data[$id] = apply_filters('op_report_sale_by_product_item',array(
-                                                'name' => $item->get_name(),
-                                                'sku' => $sku,
-                                                'qty' => $item_qty,
-                                                'sale' => $item_sales,
-                                                'profit' => $item_profit,
-                                            ),$item,$order);
-                                        }
+                                    }
+                                    $item_profit = $item_sales - ($cost_price * $item_qty);
+
+                                    if(isset($item_data[$id]))
+                                    {
+                                        $item_data[$id]['qty'] += $item_qty;
+                                        $item_data[$id]['sale'] += $item_sales;
+                                        $item_data[$id]['profit'] += $item_profit;
                                     }else{
-    
-                                        $item_qty = $item->get_quantity();
-                                        $item_sales =  $order_item_data['subtotal'];
-                                        $item_profit = $item_sales;
-                                        $custom_item_data[] = array(
+                                        $item_data[$id] = array(
                                             'name' => $item->get_name(),
-                                            'sku' => '',
                                             'qty' => $item_qty,
                                             'sale' => $item_sales,
-                                            'profit' => $item_profit
+                                            'profit' => $item_profit,
                                         );
                                     }
-    
+                                }else{
+
+                                    $item_qty = $item->get_quantity();
+                                    $item_sales =  $order_item_data['subtotal'];
+                                    $item_profit = $item_sales;
+                                    $custom_item_data[] = array(
+                                        'name' => $item->get_name(),
+                                        'qty' => $item_qty,
+                                        'sale' => $item_sales,
+                                        'profit' => $item_profit
+                                    );
                                 }
-                            }
-                            foreach($item_data as $_item)
-                            {
-                                if($_item['qty'] <= 0)
-                                {
-                                    continue;
-                                }  
-                                $summary_html.= '<tr>';
-                                $summary_html.= '<td>'.$_item['name'].'</td>';
-                                $summary_html.= '<td>'.$_item['sku'].'</td>';
-                                $summary_html.= '<td>'.$_item['qty'].'</td>';
-                                $summary_html.= '<td>'.wc_price($_item['sale']).'</td>';
-                                $summary_html.= '<td>'.wc_price($_item['profit']).'</td>';
-                                $summary_html.= '</tr>';
-                                  
-                                $orders_export_data[] = array(
-                                    $_item['name'],
-                                    $_item['sku'],
-                                    $_item['qty'],
-                                    $_item['sale'],
-                                    $_item['profit'],
-                                );
-                            }
-                            foreach($custom_item_data as $_item)
-                            {
-                                if($_item['qty'] <= 0)
-                                {
-                                    continue;
-                                }
-                                $summary_html.= '<tr>';
-                                $summary_html.= '<td>'.$_item['name'].'</td>';
-                                $summary_html.= '<td>'.$_item['sku'].'</td>';
-                                $summary_html.= '<td>'.$_item['qty'].'</td>';
-                                $summary_html.= '<td>'.wc_price($_item['sale']).'</td>';
-                                $summary_html.= '</tr>';
-    
-                                $orders_export_data[] = array(
-                                    $_item['name'],
-                                    $_item['sku'],
-                                    $_item['qty'],
-                                    $_item['sale'],
-                                    $_item['profit'],
-                                );
-                            }
-                            $summary_html.= '</table></div></div></div>';
-                            break;
-                        
-    
-                    }
-                    $result['table_data'] = array('data' => $orders_table_data,'label' => $table_label);
-                    $result['chart_data'] = $chart_data;
-                    
-                    if(count($chart_data) > 1)
-                    {
-                        $new_chart_label = array();
-                        $new_chart_data = array();
-                        $new_commsion_data = array();
-                        for($i = 1; $i < count($chart_data);$i++)
-                        {
-                            $new_chart_label[] = $chart_data[$i][0];
-                            $new_chart_data[] = $chart_data[$i][1];
-                            if(isset($chart_data[$i][2]))
-                            {
-                                $new_commsion_data[] = $chart_data[$i][2];
+
                             }
                         }
-                        $result['new_chart_data'] = array(
-                            'label' => $new_chart_label,
-                            'data'=> $new_chart_data,
-                        );
-                        if(!empty($new_commsion_data))
+                        foreach($item_data as $_item)
                         {
-                            $result['new_chart_data']['commsion_data'] = $new_commsion_data ;
+                            if($_item['qty'] <= 0)
+                            {
+                                continue;
+                            }  
+                            $summary_html.= '<tr>';
+                            $summary_html.= '<td>'.$_item['name'].'</td>';
+                            $summary_html.= '<td>'.$_item['qty'].'</td>';
+                            $summary_html.= '<td>'.wc_price($_item['sale']).'</td>';
+                            $summary_html.= '<td>'.wc_price($_item['profit']).'</td>';
+                            $summary_html.= '</tr>';
+                              
+                            $orders_export_data[] = array(
+                                $_item['name'],
+                                $_item['qty'],
+                                $_item['sale'],
+                                $_item['profit'],
+                            );
                         }
-                    }
-                    $result['orders_export_data'] = $orders_export_data;
-                    $result['summary_html'] = $summary_html;
-                    $result['export_file'] = '';
+                        foreach($custom_item_data as $_item)
+                        {
+                            if($_item['qty'] <= 0)
+                            {
+                                continue;
+                            }
+                            $summary_html.= '<tr>';
+                            $summary_html.= '<td>'.$_item['name'].'</td>';
+                            $summary_html.= '<td>'.$_item['qty'].'</td>';
+                            $summary_html.= '<td>'.wc_price($_item['sale']).'</td>';
+                            $summary_html.= '</tr>';
+
+                            $orders_export_data[] = array(
+                                $_item['name'],
+                                $_item['qty'],
+                                $_item['sale'],
+                                $_item['profit'],
+                            );
+                        }
+                        $summary_html.= '</table></div></div></div>';
+                        break;
                     
-                    $result = apply_filters('op_report_result',$result,$ranges,$report_type);
-                    
-                    if($is_export)
-                    {
-                        $upload_dir = wp_upload_dir();
-                        $url = $upload_dir['baseurl'];
-                        $url = rtrim($url,'/');
-    
-                        $objPHPExcel = new PHPExcel();
-                        $objPHPExcel->setActiveSheetIndex(0);
-    
-                        $objPHPExcel->getActiveSheet()->fromArray( $result['orders_export_data'], null, 'A1');
-                        $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-                        $file_name = 'openpos-report-'.time().'.xls';
-                        $upload_dir_path = $upload_dir['basedir'];
-                        $upload_dir_path = rtrim($upload_dir_path,'/');
-    
-                        $objWriter->save($upload_dir_path.'/openpos/'.$file_name);
-    
-                        $result['export_file'] = $url.'/openpos/'.$file_name;
-                    }
-                    
-                }catch(Exception $e)
+
+                }
+
+
+                
+                
+                $result['table_data'] = array('data' => $orders_table_data,'label' => $table_label);
+                $result['chart_data'] = $chart_data;
+                
+                if(count($chart_data) > 1)
                 {
-                    $message = $e->getMessage();
-                    $result['summary_html'] = $message;
-                    $result['chart_data'] = array();
-                    $result['new_chart_data'] = array();
-                    $result['table_data'] = array();
+                    $new_chart_label = array();
+                    $new_chart_data = array();
+                    $new_commsion_data = array();
+                    for($i = 1; $i < count($chart_data);$i++)
+                    {
+                        $new_chart_label[] = $chart_data[$i][0];
+                        $new_chart_data[] = $chart_data[$i][1];
+                        if(isset($chart_data[$i][2]))
+                        {
+                            $new_commsion_data[] = $chart_data[$i][2];
+                        }
+                    }
+                    $result['new_chart_data'] = array(
+                        'label' => $new_chart_label,
+                        'data'=> $new_chart_data,
+                    );
+                    if(!empty($new_commsion_data))
+                    {
+                        $result['new_chart_data']['commsion_data'] = $new_commsion_data ;
+                    }
+                }
+                $result['orders_export_data'] = $orders_export_data;
+                $result['summary_html'] = $summary_html;
+                $result['export_file'] = '';
+                
+                $result = apply_filters('op_report_result',$result,$ranges,$report_type);
+                
+                if($is_export)
+                {
+                    $upload_dir = wp_upload_dir();
+                    $url = $upload_dir['baseurl'];
+                    $url = rtrim($url,'/');
+
+                    $objPHPExcel = new PHPExcel();
+                    $objPHPExcel->setActiveSheetIndex(0);
+
+                    $objPHPExcel->getActiveSheet()->fromArray( $result['orders_export_data'], null, 'A1');
+                    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+                    $file_name = 'openpos-report-'.time().'.xls';
+                    $upload_dir_path = $upload_dir['basedir'];
+                    $upload_dir_path = rtrim($upload_dir_path,'/');
+
+                    $objWriter->save($upload_dir_path.'/openpos/'.$file_name);
+
+                    $result['export_file'] = $url.'/openpos/'.$file_name;
+// TRG -2 START
+// TRG -2  END
                 }
                 echo json_encode($result);
-                
 
             }
 
@@ -4330,7 +4307,6 @@ class Openpos_Admin{
         global  $op_warehouse;
         global $op_register;
         global $op_report;
-        global $op_woo;
         $report_type = 'sales';
         $report_duration =  'today';
         $report_action =  '';
@@ -4425,7 +4401,7 @@ class Openpos_Admin{
         $allow_laybuy = $this->settings_api->get_option('pos_laybuy','openpos_pos') == 'yes' ? true : false;
 
         
-        $payment_gateways = WC()->payment_gateways->payment_gateways();
+         $payment_gateways = WC()->payment_gateways->payment_gateways();
         $payment_options = array();
         foreach ($payment_gateways as $code => $p)
         {
@@ -4438,13 +4414,11 @@ class Openpos_Admin{
         $addition_payments = $this->core->additionPaymentMethods();
         $payment_options = array_merge($payment_options, $addition_payments);
 
-        
-        
+// TRG -2 START
+        $setting_payment_methods = $this->core->formatPaymentMethods($payment_options);
+        // TRG -2  END
 
-        $setting_payment_methods =  apply_filters('report_form_setting_payment_methods',$this->core->formatPaymentMethods($payment_options));
-        $warehouses =  apply_filters('report_form_warehouses',$op_warehouse->warehouses() );
-        $cashiers =  apply_filters('report_form_cashiers',$op_woo->get_cashiers() );
-        
+
 
         require(OPENPOS_DIR.'templates/admin/report/report_form.php');
         require(OPENPOS_DIR.'templates/admin/report/report_'.esc_attr($report_type).'_chart.php');
@@ -4956,10 +4930,7 @@ class Openpos_Admin{
             'format' => false
         ), $atts, 'op_product' );
         $result = '';
-        if(!$_op_product || $_op_product == null)
-        {
-            return '';
-        }
+// TRG -2 
         switch ($atts['attribute'])
         {
             case 'barcode':
@@ -5078,26 +5049,8 @@ class Openpos_Admin{
     public function print_bacode(){
         $is_preview = isset($_REQUEST['is_preview']) && $_REQUEST['is_preview'] == 1 ? true : false;
         $is_print = isset($_REQUEST['is_print']) && $_REQUEST['is_print'] == 1 ? true : false;
-
-        $product_id_str = isset($_REQUEST['product_id']) ? $_REQUEST['product_id'] : '';
-        $_product_ids = explode(',',$product_id_str);
-        $total = isset($_REQUEST['total']) ? intval($_REQUEST['total']) : -1;
-        $_tmp_product_ids = array();
-        if($total == -1){
-            foreach($_product_ids as $id)
-            {
-                $_op_product = wc_get_product(intval($id));
-               
-                $_tmp_product_ids[$id] = apply_filters('op_product_label_qty',1,$_op_product);
-            }
-        }else{
-            foreach($_product_ids as $id)
-            {
-                $_tmp_product_ids[$id] = 1;
-            }
-        }
-        $product_ids = apply_filters('admin_print_bacode_product_ids',$_tmp_product_ids);
-        
+// TRG -2 START 
+// TRG -2. END 
         if($is_preview)
         {
             global $_op_product;
@@ -5108,8 +5061,6 @@ class Openpos_Admin{
                 require(OPENPOS_DIR.'templates/admin/print_barcode.php');
             }else{
                 global $_op_product;
-                
-                
                 require(OPENPOS_DIR.'templates/admin/print_barcode_paper.php');
             }
         }
@@ -5744,12 +5695,11 @@ class Openpos_Admin{
         {
             die(__('Your warehouse do not exist.','openpos'));
         }
-        $args = array(
+	// TRG -2 START
+        $query = $this->core->getProducts(array( 
             'numberposts' => -1
-        );
-        $final_args = apply_filters('admin_export_inventory_args',$args);
-
-        $query = $this->core->getProducts($final_args);
+        ));
+// TRG -2 END 
         $products = $query['posts'];
         $filename = 'inventory.csv';
         $fh = @fopen( 'php://output', 'w' );
@@ -5903,7 +5853,7 @@ class Openpos_Admin{
         try{
             $data = array();
 
-            if( isset($_FILES['file']))
+            if(current_user_can('upload_files') && isset($_FILES['file']))
             {
                 $file = $_FILES['file'];
                 if($file['type'])
@@ -5912,9 +5862,8 @@ class Openpos_Admin{
                     $csv = $spreadsheet->getActiveSheet()->toArray();
                     $labels = $csv[0];
                     array_shift($csv);
-                    $barcode_index = -1;
-                    $qty_index = -1;
-                    $id_index = -1;
+                    $barcode_index = 0;
+                    $qty_index = 0;
                     foreach($labels as $key => $label)
                     {
                         if(strtoupper($label) == strtoupper('barcode'))
@@ -5925,25 +5874,15 @@ class Openpos_Admin{
                         {
                             $qty_index = $key;
                         }
-                        if(strtoupper($label) == strtoupper('id'))
-                        {
-                            $id_index = $key;
-                        }
-                        
                     }
-                   
 
                     foreach($csv as $row)
                     {
                         $barcode = $row[$barcode_index];
                         $qty = $row[$qty_index];
-                        if($id_index == -1)
-                        {
-                            $product_id = $this->core->getProductIdByBarcode($barcode);
-                        }else{
-                            $product_id = $row[$id_index];
-                        }
-                        
+// TRG -2 
+                        $product_id = $this->core->getProductIdByBarcode($barcode);
+// TRG -2 
                         $post = get_post($product_id);
                         if($post)
                         {

@@ -125,31 +125,4 @@
         <td style="font-weight: bold;padding-bottom: 10px;"><%- custom_transaction_total_currency_formatted %></td>
     </tr>
 </table>
-
-
-<% if(typeof custom_transactions != "undefined"  ){ %>
-<p style="text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-    text-transform: uppercase;margin-top:10px;border-top:solid 1px #000;padding:5px;">Custom Transactions</p>
-    <% custom_transactions.forEach(function(transaction){ %>
-    <table border="0" style="width:100%;border-top:dotted 1px #000;">
-    <tr>
-    	<th style="
-    text-transform: uppercase;
-    font-size: 12px;
-    font-weight: 200;
-    text-align:right;
-    padding: 2px;
-    width: 50%;
-"><%- transaction.ref %></th>
-        <td style="font-weight: bold;"><%- transaction.in_amount.toFixed(2) %></td>
-    </tr>
-    <tr>
-      <td  style="font-size:12px;">  <%= new Date(transaction.created_at_time).getDate() %>/<%= new Date(transaction.created_at_time).getMonth() %>/<%= new Date(transaction.created_at_time).getFullYear() %> at <%= new Date(transaction.created_at_time).getHours() %>:<%= new Date(transaction.created_at_time).getMinutes() %> </td>
-      <td style="font-weight: bold; text-decoration: line-through;"><%- transaction.out_amount.toFixed(2) %></td>
-    </tr>
-</table>
-    <% }) %>
-    
-<% } %>
+<!-- TRG-2 -->

@@ -161,3 +161,8 @@ span.option-item-label{
 body.focused #scan-barcode-input{
     opacity: 1;
 } */
+/* TRG-2 :start  */
+button.mat-menu-item.add-cart-more-menu.fee.ng-star-inserted {
+    display: none;
+}
+/* TRG-2 end  */
