@@ -1,6 +1,0 @@
-
-
-<div id="legalcopy">
-     <p style="text-align: center;" class="legal">Quý khách vui lòng kiểm tra hàng trước khi thanh toán. Hàng sẽ không được đổi sau khi đã thanh toán
-     <br/>Cảm ơn quý khách. Hẹn gặp lại!</p>
-</div>

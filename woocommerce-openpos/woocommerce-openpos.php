@@ -1,18 +1,17 @@
 <?php
-// TRG-1 start 
-
 /*
-Plugin Name: POS Quản lý bán hàng
-Description: Quản lý bán hàng.
-Author: custom 
-Author URI:custom - duc_url
-Version: 1.0.2
+Plugin Name: Woocommerce OpenPos
+Plugin URI: http://wpos.app
+Description: Quick POS system for woocommerce.
+Author: anhvnit@gmail.com
+Author URI: http://openswatch.com/
+Version: 5.9.8
 WC requires at least: 3.0
-WC tested up to: 1
-Text Domain: custom
+WC tested up to: 6.5
+Text Domain: openpos
+License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 */
 
-// TRG-1 end  
 define('OPENPOS_DIR',plugin_dir_path(__FILE__));
 define('OPENPOS_URL',plugins_url('woocommerce-openpos'));
 

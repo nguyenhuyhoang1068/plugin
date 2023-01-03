@@ -23,9 +23,9 @@
             <div class="payment-details">
                 <ul class="payment-methods">
                     <% payment_method.forEach(function(payment){ %>
-                        <li><%= payment.name %> : <%= payment.paid %></li><!-- TRG-2  -->
+                        <li><%= payment.name %> : <%= payment.paid_currency_formatted %></li>
                         <% if (payment.code == "cash" && payment.return > 0) { %>
-                            <li>Return: <%= payment.return %></li><!-- TRG-2  -->
+                            <li>Return: <%= payment.return_currency_formatted %></li>
                         <% } %>
                     <% }); %>
                 </ul>
@@ -46,8 +46,9 @@
 
 <table>
     <tr class="tabletitle items-table-label">
-        <td class="item"><h2>Item haha</h2></td><!-- TRG-2 -->
+        <td class="item"><h2>Item</h2></td>
         <td class="qty"><h2>Price</h2></td>
+        <td class="qty"><h2>Price(incl tax)</h2></td>
         <td class="qty"><h2>Qty</h2></td>
         <td class="total"><h2>Total</h2></td>
         <td class="total"><h2>Discount</h2></td>
@@ -74,7 +75,7 @@
         <%= item.final_price_currency_formatted %>
         </p>
         </td>
-<!-- TRG-2  -->
+        <td class="tableitem item-qty"><p class="itemtext"><%= item.final_price_incl_tax_currency_formatted %></p></td>
         <td class="tableitem item-qty"><p class="itemtext"><%= item.qty %></p></td>
 
         <td class="tableitem item-total"><p class="itemtext"><%= item.total_currency_formatted %></p></td>
@@ -83,15 +84,34 @@
         <td class="tableitem item-total"><p class="itemtext"><%= item.total_incl_tax_currency_formatted %></p></td>
     </tr>
     <% }); %>
-<!-- TRG-2  -->
+   <% if(typeof fee_items != "undefined" ) { %>    
+     <% fee_items.forEach(function(fee_item){ %>
+    <tr class="fee service">
+        <td class="tableitem item-name" colspan="4">
+            <p class="itemtext"><%= fee_item.name %></p>
+           
+        </td>
+        <td class="tableitem item-total"><p class="itemtext"><%= fee_item.total %></p></td>
+        
+        <td class="tableitem item-total"><p class="itemtext"><%= fee_item.tax %></p></td>
+        
+        <td class="tableitem item-total"><p class="itemtext"><%= fee_item.total_incl_tax %></p></td>
+    </tr>
+    <% }); %>
+     <% } %>  
     <tr class="tabletitle">
 
         <td class="Rate sub-total-title" style="text-align:right;padding-right:5px;"  colspan="6"><h2>Sub Total</h2></td>
         <td class="payment sub-total-amount"><h2><%= sub_total_currency_formatted %></h2></td>
     </tr>
-<!-- TRG-2  -->
+    <% if(typeof total_fee != "undefined" && total_fee > 0) { %>      
+    <tr class="tabletitle">
 
-<!-- TRG-2  -->
+        <td class="Rate fee-total-title" style="text-align:right;padding-right:5px;"  colspan="6"><h2>Fee</h2></td>
+        <td class="payment sub-total-amount"><h2><%= total_fee %></h2></td>
+    </tr>
+    <% } %>      
+
     <tr class="tabletitle">
 
         <td class="Rate shipping-title" style="text-align:right;padding-right:5px;"  colspan="6"><h2>Shipping</h2></td>
@@ -116,7 +136,7 @@
     </tr>
     <tr class="tabletitle">
 
-        <td class="Rate grand-total-title" style="text-align:right;padding-right:5px;"  colspan="6"><h2>Grand Total 3</h2></td>
+        <td class="Rate grand-total-title" style="text-align:right;padding-right:5px;"  colspan="6"><h2>Grand Total</h2></td>
         <td class="payment grand-total-amount"><h2><%= grand_total_currency_formatted %></h2></td>
     </tr>
     <% if(typeof customer_total_paid_currency_formatted != "undefined") { %>             

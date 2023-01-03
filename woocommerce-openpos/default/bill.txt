@@ -4,10 +4,17 @@
         <p class="lead"><%= lang.label_cashier %> :  <%= session_user %></p>
     </div>
 </div>
-<!--TRG-2 Start -->
-<div class="container content-container">
 
-<!--TRG-2 End -->
+<div class="container content-container">
+<% if(typeof checkout_guide != undefined && checkout_guide.length > 5){%>
+    <div class="row">
+        <div class="col-md-12">
+        <%- checkout_guide %>
+        </div>
+    </div>
+<% }else{ %>
+
+
     <h3><%= lang.label_products %></h3>
     <div class="row">
         <div class="col-md-12">
@@ -35,7 +42,7 @@
         </div>
 
     </div>
-<!--TRG-2 -->
+<% } %>
 </div> <!-- /container -->
 <footer class="footer">
     <div class="container">

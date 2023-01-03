@@ -59,15 +59,4 @@ border-bottom:solid 1px #000;
 }
 .served .tableitem p{
     text-decoration: line-through;
-}<!-- TRG-2 Start -->
-
-#mid .info .center{
-text-align: center;
 }
- #mid .info .display_flex{
-display:flex;
- width: 100%;
- }
-#mid .info .display_flex p {
-width: 50%;
- } <!-- TRG-2 End -->

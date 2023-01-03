@@ -154,15 +154,10 @@ span.option-item-label{
     padding: 0 10px 0 0;
 }
 
-
+/* 
 #scan-barcode-input{
     opacity: 0.5;
 }
 body.focused #scan-barcode-input{
     opacity: 1;
-}
-/* TRG-1 :start  */
-button.mat-menu-item.add-cart-more-menu.fee.ng-star-inserted {
-    display: none;
-}
-/* TRG-1 end  */
+} */
